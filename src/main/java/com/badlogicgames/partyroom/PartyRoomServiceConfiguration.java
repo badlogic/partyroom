@@ -13,6 +13,11 @@ public class PartyRoomServiceConfiguration extends Configuration implements com.
 	@NotNull
 	public StaticAssetsConfiguration assets = new StaticAssetsConfiguration();
 	
+	@JsonProperty
+	@Valid
+	@NotNull
+	public String youtubeKey;
+	
 	@Override
 	public StaticAssetsConfiguration getAssetsConfiguration () {
 		return assets;

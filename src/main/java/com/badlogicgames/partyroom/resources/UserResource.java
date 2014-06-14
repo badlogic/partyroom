@@ -22,24 +22,24 @@ public class UserResource {
 	@POST
 	@Path("signup")
 	public String signup(User user) {
-		return users.signup(user.name, user.imageUrl, user.password);
+		return users.signup(user.name, user.imageUrl, user.getPassword());
 	}
 	
 	@POST
 	@Path("login")
 	public String login(User user) {
-		return users.login(user.name, user.password);
+		return users.login(user.name, user.getPassword());
 	}
 	
 	@POST
 	@Path("logout")
-	public void logout(String token) {
+	public void logout(String userId) {
 		// FIXME
 	}
 	
 	@POST
 	@Path("getUser")
-	public User getUser(String token) {
-		return users.getUser(token);
-	}
+	public User getUser(String userId) {
+		return users.getUser(userId);
+	}		
 }

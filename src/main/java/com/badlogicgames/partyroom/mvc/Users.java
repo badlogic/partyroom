@@ -29,7 +29,7 @@ public class Users {
 				User user = new User();
 				user.name = userName;
 				user.imageUrl = userImageUrl;
-				user.password = password;
+				user.setPassword(password);
 				String id = UUID.randomUUID().toString();
 				users.put(userName, user);
 				idToUsers.put(id, user);
@@ -45,7 +45,7 @@ public class Users {
 		
 		synchronized(users) {
 			if(!users.containsKey(userName)) throw new WebApplicationException(Status.FORBIDDEN);
-			if(password.equals(users.get(userName).password)) return namesToIds.get(userName);
+			if(password.equals(users.get(userName).getPassword())) return namesToIds.get(userName);
 			else throw new WebApplicationException(Status.FORBIDDEN);
 		}
 	}

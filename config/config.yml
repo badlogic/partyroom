@@ -4,6 +4,8 @@ http:
   rootPath: /app/*
   requestLog:
     console:
-      enabled: true
+      enabled: false
     file:
       enabled: false
+
+youtubeKey: AIzaSyDLnw29DUCETqv9gL2YtCx6iLNkEmt1ArE

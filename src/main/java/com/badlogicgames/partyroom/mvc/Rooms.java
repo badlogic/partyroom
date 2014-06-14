@@ -17,8 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Rooms {	
 	private final Map<String, Room> rooms = new ConcurrentHashMap<>();
+	private final String youtubeKey;
 	
-	public Rooms() {
+	public Rooms(String youtubeKey) {
+		this.youtubeKey = youtubeKey;
 		final Thread t = new Thread(() -> {
 			while(true) {
 				synchronized(rooms) {
@@ -55,6 +57,7 @@ public class Rooms {
 			room = rooms.get(roomName);
 			if(room == null) {
 				room = new Room();
+				room.youtubeKey = youtubeKey;
 				room.name = roomName;
 				rooms.put(roomName, room);
 			}			
@@ -69,20 +72,28 @@ public class Rooms {
 		}
 		if(!found) {
 			leave(user);
-			room.users.add(user);
 			user.roomName = roomName;
+			synchronized(room) {
+				room.users.add(user);
+			}
 		}
 		return room;
 	}
 	
+	/**
+	 * Removes the user from any room she's currently in.
+	 */
 	public void leave(User user) {
+		user.song = null;
 		if(user.roomName != null) {
 			Room oldRoom = rooms.get(user.roomName);
 			if(oldRoom != null) {
-				oldRoom.users.remove(user);
-				if(oldRoom.users.size() == 0) {
-					synchronized(rooms) {
-						rooms.remove(oldRoom.name);
+				synchronized(oldRoom) {
+					oldRoom.users.remove(user);
+					if(oldRoom.users.size() == 0) {
+						synchronized(rooms) {
+							rooms.remove(oldRoom.name);
+						}
 					}
 				}
 			}
@@ -92,10 +103,31 @@ public class Rooms {
 	/**
 	 * Returns the current status of the room
 	 */
-	public Room getRoom(String roomName) {
-		return rooms.get(roomName);
+	public Room getStatus(String roomName) {
+		Objects.requireNonNull(roomName, "room name may not be null");
+
+		Room room = rooms.get(roomName);
+		synchronized(room) {
+			if(room.switchTime < System.nanoTime()) {
+				room.currentUser++;
+				if(room.currentUser >= room.users.size()) room.currentUser = 0;
+				room.currentSong = room.users.get(room.currentUser).song;
+				room.users.get(room.currentUser).song = null;
+				room.startTime = room.currentSong == null? 0: new Date().getTime();
+				if(room.currentSong != null) {
+					room.switchTime = System.nanoTime() + room.currentSong.duration * 1000000000l + 4000000000l;
+				} else {
+					room.switchTime = System.nanoTime() + 1000000000;
+				}
+				System.out.println("switched song: " + room.currentSong);
+			}
+		}
+		return room;
 	}
 	
+	/**
+	 * Adds a new message from the given user to the room's chat log
+	 */
 	public Room sendMessage(String roomName, String message, User user) {
 		Objects.requireNonNull(roomName, "room name may not be null");
 		Objects.requireNonNull(message, "message may not be null");
@@ -123,5 +155,18 @@ public class Rooms {
 			descriptors.add(desc);
 		}
 		return descriptors;
+	}
+
+	/**
+	 * Sets the song to be played for the next user. Synchs on the room
+	 * the user is in, hence why it's in this class.
+	 */
+	public void setSong (User user, Item song) {
+		Objects.requireNonNull(user, "user may not be null");
+		
+		Room room = rooms.get(user.roomName);
+		synchronized(room) {
+			user.song = song;
+		}
 	}
 }

@@ -75,4 +75,11 @@ public class RoomResource {
 		User user = users.getUser(req.userId);
 		rooms.setSong(user, req.song);
 	}
+	
+	@POST
+	@Path("vote")
+	public void vote(VoteRequest req) {
+		User user = users.getUser(req.userId);
+		rooms.vote(req.vote, user);
+	}
 }

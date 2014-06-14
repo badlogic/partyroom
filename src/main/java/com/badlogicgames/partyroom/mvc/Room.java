@@ -13,4 +13,6 @@ public class Room {
 	public long startTime; // start time in UTC	
 	public long switchTime; // time at which we switch to the next user/song, server system time
 	public String youtubeKey;
+	public int positiveVotes;
+	public int negativeVotes;
 }

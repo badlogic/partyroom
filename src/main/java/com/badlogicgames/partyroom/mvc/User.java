@@ -10,6 +10,7 @@ public class User {
 	public volatile String roomName;
 	public Item song;
 	public volatile long lastUpdate; // used for heartbeat in room
+	public volatile int lastVote; 
 	
 	@JsonIgnore
 	public String getPassword () {

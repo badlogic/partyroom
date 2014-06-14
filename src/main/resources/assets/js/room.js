@@ -145,6 +145,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.playVideo = function(id, startTime) {
 		var offset = (new Date().getTime() - new Date(startTime).getTime()) / 1000
 		console.log("playing video " + id + ", " + offset);
+		if(offset < 0) offset = 0;
 		player.loadVideoById(id, offset);		
 	}
 	

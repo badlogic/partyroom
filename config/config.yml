@@ -4,7 +4,7 @@ http:
   rootPath: /app/*
   requestLog:
     console:
-      enabled: false
+      enabled: true
     file:
       enabled: false
 

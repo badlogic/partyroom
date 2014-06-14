@@ -49,7 +49,9 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	if(!$scope.roomName) {
 		$window.location.href="index.html";
 		return;
-	};
+	} else {
+		$scope.roomName = decodeURIComponent($scope.roomName);
+	}
 	
 	// join the room and start the heartbeat
 	$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
@@ -241,5 +243,19 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.shuffleSongs = function() {
 		shuffle($scope.playList);
 		$scope.updateSong();
+	}
+	
+	$scope.upvote = function() {
+		$http.post("app/rooms/vote", {
+			userId: AuthService.getToken(),
+			vote: 1
+		});
+	}
+	
+	$scope.downvote = function() {
+		$http.post("app/rooms/vote", {
+			userId: AuthService.getToken(),
+			vote: -1
+		});
 	}
 }]);

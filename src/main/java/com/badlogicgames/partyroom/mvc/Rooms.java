@@ -73,6 +73,7 @@ public class Rooms {
 		if(!found) {
 			leave(user);
 			user.roomName = roomName;
+			user.lastVote = 0;
 			synchronized(room) {
 				room.users.add(user);				
 			}
@@ -113,7 +114,7 @@ public class Rooms {
 
 		Room room = rooms.get(roomName);
 		synchronized(room) {
-			if(room.switchTime < System.nanoTime()) {
+			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
 				room.currentUser++;
 				if(room.currentUser >= room.users.size()) room.currentUser = 0;
 				room.currentSong = room.users.get(room.currentUser).song;
@@ -124,7 +125,20 @@ public class Rooms {
 				} else {
 					room.switchTime = System.nanoTime() + 1000000000;
 				}
-				System.out.println("switched song: " + room.currentSong);
+				
+				if(room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
+					Message msg = new Message();
+					msg.message = "Skipped song due to vote";
+					msg.utcTimeStamp = new Date().getTime();
+					msg.userName = null;
+					room.messages.add(msg);
+				}
+				
+				for(User user: room.users) {
+					user.lastVote = 0;
+				}
+				room.positiveVotes = 0;
+				room.negativeVotes = 0;
 			}
 		}
 		return room;
@@ -172,6 +186,32 @@ public class Rooms {
 		Room room = rooms.get(user.roomName);
 		synchronized(room) {
 			user.song = song;
+		}
+	}
+	
+	/**
+	 * Sets the vote for the user in the room she's in.
+	 */
+	public void vote(int vote, User user) {
+		Objects.requireNonNull(user, "user may not be null");
+		Room room = rooms.get(user.roomName);
+		synchronized(room) {
+			vote = (int)Math.signum(vote);
+			if(user.lastVote != vote) {
+				if(user.lastVote < 0) {
+					room.negativeVotes--;					
+				}
+				if(user.lastVote > 0) {
+					room.positiveVotes--;
+				}
+				if(vote < 0) {
+					room.negativeVotes++;
+				}
+				if(vote > 0) {
+					room.positiveVotes++;
+				}
+			}
+			user.lastVote = vote;
 		}
 	}
 }

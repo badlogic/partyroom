@@ -1,4 +1,4 @@
-- add voting (must be more than 50% for a switch)
+- disallow multi-connect
 - remove user from room on disconnect (browser/tab close, url change, etc.)
 - private channels
 - limited channels (admin can set who can enqueue and who can't)

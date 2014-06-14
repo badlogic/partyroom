@@ -22,7 +22,7 @@ public class UserResource {
 	@POST
 	@Path("signup")
 	public String signup(User user) {
-		return users.signup(user.name, user.imageUrl, user.getPassword());
+		return users.signup(user.name, user.getPassword());
 	}
 	
 	@POST

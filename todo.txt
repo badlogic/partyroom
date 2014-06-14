@@ -1,5 +1,4 @@
 - add voting (must be more than 50% for a switch)
-- display next DJ and her song
-- display list of users, mark current user
 - remove user from room on disconnect (browser/tab close, url change, etc.)
-- modify playlist, delete, move up/down
+- private channels
+- limited channels (admin can set who can enqueue and who can't)

@@ -57,25 +57,43 @@ body {
 	margin: 0 auto;
 }
 
-.box {	
-	border: 1px solid #333;
-	padding: 0px;
-	min-height: 300px;
-	max-height: 300px;
-}
+.box {
+    margin-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 15px;      
+    padding-bottom: 15px; 
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
 
-.inner-box {
-	border: 1px solid #333;
-	padding: 5px;
-}
-
-.scrollable {
-	max-height: 232px;
-	overflow: auto;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.33);
+    -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,0.33);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.33);
+    background: #fff;
 }
 
 .playlist {
-	max-height: 266px;
+	height: 214px;	
+	overflow: auto;
+}
+
+.searchlist {
+	height: 180px;	
+	overflow: auto;
+}
+
+.chatlist {
+	height: 232px;
+	overflow:auto;
+}
+
+.userlist {
+	height: 266px;
 	overflow: auto;
 }
 
@@ -84,15 +102,24 @@ body {
 }
 
 .video-img {
+	width: 120px;
 	margin-left: 10px;
-	margin-right: 10px;
+	margin-right: 10px;	
 	float:left;	
+}
+
+.nopadding {
+	padding: 0px;
 }
 
 .video-title {
 	margin: 10px;	
 }
 
-.clear {	
-	clear: both;	
+.pointer {
+	cursor: pointer;
+}
+
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+	vertical-align: middle;
 }

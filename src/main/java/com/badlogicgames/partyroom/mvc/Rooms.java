@@ -74,9 +74,14 @@ public class Rooms {
 			leave(user);
 			user.roomName = roomName;
 			synchronized(room) {
-				room.users.add(user);
+				room.users.add(user);				
 			}
 		}
+		Message msg = new Message();
+		msg.message = "User " + user.name + " joined";
+		msg.utcTimeStamp = new Date().getTime();
+		msg.userName = null;
+		room.messages.add(msg);
 		return room;
 	}
 	

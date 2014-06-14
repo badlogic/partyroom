@@ -15,11 +15,8 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "ipCookie", "Au
 		$window.location.href="index.html";
 	});
 	
-	$scope.join = function(roomName) {
-		$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": roomName }).
-		success(function(data) {
-			$window.location.href="room.html?name=" + roomName;
-		});
+	$scope.join = function(roomName) {		
+		$window.location.href="room.html?name=" + roomName;
 	}
 	
 	$scope.roomClicked = function(room) {

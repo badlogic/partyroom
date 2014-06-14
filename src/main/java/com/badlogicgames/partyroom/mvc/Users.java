@@ -18,7 +18,7 @@ public class Users {
 	 * Creates a (temporary) user with the given username and (optional) image url.
 	 * Returns a unique id by which the user will be identified.
 	 */
-	public String signup(String userName, String userImageUrl, String password) {
+	public String signup(String userName, String password) {
 		Objects.requireNonNull(userName, "user name must not be null");
 		Objects.requireNonNull(password, "password must not be null");
 		
@@ -27,8 +27,7 @@ public class Users {
 				throw new WebApplicationException(Status.FORBIDDEN);
 			} else {
 				User user = new User();
-				user.name = userName;
-				user.imageUrl = userImageUrl;
+				user.name = userName;				
 				user.setPassword(password);
 				String id = UUID.randomUUID().toString();
 				users.put(userName, user);

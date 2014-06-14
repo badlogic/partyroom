@@ -1,3 +1,5 @@
 - add voting (must be more than 50% for a switch)
 - display next DJ and her song
 - display list of users, mark current user
+- remove user from room on disconnect (browser/tab close, url change, etc.)
+- maybe persist playlist on server as well? hairy

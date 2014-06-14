@@ -1,0 +1,67 @@
+<include>templates/header.html</include>
+
+<script src="js/room.js"></script>
+
+<div ng-controller="RoomController">
+	<!-- Main window -->
+	<div class="row">
+		<div class="col-md-8">
+			<h2 class="text-center">Room "{{roomName}}"</h2>
+		</div>
+	</div>
+	
+	<!-- Widgets -->
+	<div class="row">
+		<!-- Playlist -->
+		<div class="col-md-4 box">
+			<div class="inner-box">
+				Your Playlist
+			</div>
+			<div class="playlist">
+				<div ng-repeat="song in playList">
+					<div>							
+						<img class="video-img" ng-src="{{song.thumbnail}}"/>
+						<div class="video-title"><strong>{{song.title}}</strong></br></div>
+						<div class="clear"></div>														
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<!-- Search box -->
+		<div class="col-md-4 box">
+			<div class="inner-box">
+				Add Songs
+			</div>
+			<form ng-submit="search()">
+				<input type="text" class="form-control" placeholder="Search songs" required ng-model="query">
+			</form>
+			<div class="scrollable" id="searchlist">
+				<div ng-repeat="result in searchResults">
+					<div style="cursor: pointer;" ng-click="addSong(result)">							
+						<img class="video-img" ng-src="{{result.thumbnail}}"/>
+						<div class="video-title"><strong>{{result.title}}</strong></br></div>
+						<div class="clear"></div>														
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Chat box -->
+		<div class="col-md-4 box">
+			<div class="inner-box">
+				Chat ({{room.users.length}} users)
+			</div>
+			<div class="scrollable" id="chatlist">
+				<div class="chat-message" ng-repeat="message in room.messages">
+					<strong>{{message.userName}}:
+					</strong> {{message.message}}</li>
+				</div>
+			</div>
+			<form ng-submit="sendMessage()">
+				<input type="text" class="form-control" placeholder="Message..." required ng-model="message">
+			</form>
+		</div>									
+	</div>
+</div>
+<include>templates/footer.html</include>

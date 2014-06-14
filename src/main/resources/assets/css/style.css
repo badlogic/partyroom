@@ -1,0 +1,98 @@
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #eee;
+}
+
+.logo {
+	font-family: "Lato", "Open Sans";
+	font-size: 70px;	
+}
+
+.logo-small {
+	font-family: "Lato", "Open Sans";
+	font-size: 20px;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.room-list {
+	max-width: 330px;
+	max-height: 300px;
+	scroll: auto;
+	padding: 15px;
+	margin: 0 auto;
+}
+
+.box {	
+	border: 1px solid #333;
+	padding: 0px;
+	min-height: 300px;
+	max-height: 300px;
+}
+
+.inner-box {
+	border: 1px solid #333;
+	padding: 5px;
+}
+
+.scrollable {
+	max-height: 232px;
+	overflow: auto;
+}
+
+.playlist {
+	max-height: 266px;
+	overflow: auto;
+}
+
+.chat-message {
+	margin-left: 10px;	
+}
+
+.video-img {
+	margin-left: 10px;
+	margin-right: 10px;
+	float:left;	
+}
+
+.video-title {
+	margin: 10px;	
+}
+
+.clear {	
+	clear: both;	
+}

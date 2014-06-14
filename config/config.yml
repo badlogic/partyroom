@@ -1,0 +1,9 @@
+http:
+  port: 8080
+  adminPort: 8081
+  rootPath: /app/*
+  requestLog:
+    console:
+      enabled: true
+    file:
+      enabled: false

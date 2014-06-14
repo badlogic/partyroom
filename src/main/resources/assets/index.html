@@ -1,0 +1,44 @@
+<include>templates/header.html</include>
+
+<script>
+app.controller("LoginController", ["$scope", "$http", "$window", "ipCookie", "AuthService", function($scope, $http, $window, ipCookie, AuthService) {
+	if(AuthService.loggedIn()) {
+		$window.location.href = "/lobby.html";
+		return;
+	}
+	$scope.error = false;
+	$scope.keepLogin = false;
+	$scope.loginData = {};
+	$scope.signup = function() {
+		if(!$scope.loginData.name || !$scope.loginData.password) return;
+		AuthService.signup($scope.loginData, $scope.keepLogin).success(function(data) {
+			$window.location.href = "/lobby.html"
+		})
+		.error(function(data) {
+			$scope.error = true;			
+		});
+	};
+	$scope.login = function() {
+		if(!$scope.loginData.name || !$scope.loginData.password) return;
+		AuthService.login($scope.loginData, $scope.keepLogin).success(function(data) {
+			$window.location.href = "/lobby.html"
+		})
+		.error(function(data) {
+			$scope.error = true;			
+		});
+	};
+}]);
+</script>
+
+<div class="row" ng-controller="LoginController">	
+	<form class="form-signin" role="form" ng-show="loginData">
+		<div ng-show="error" class="alert alert-danger">Whoops</div>
+		<input type="text" class="form-control" placeholder="User name" required autofocus ng-model="loginData.name">
+		<input type="password" class="form-control" placeholder="Password" required ng-model="loginData.password">
+		<label class="checkbox"> <input type="checkbox" value="remember-me" ng-model="keepLogin">Remember me</label>
+		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="login()">Login</button>
+		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="signup()">Sign up</button>
+	</form>
+</div>
+
+<include>templates/footer.html</include>

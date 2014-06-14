@@ -1,0 +1,48 @@
+<include>templates/header.html</include>
+
+<script>
+app.controller("LobbyController", ["$scope", "$http", "$window", "ipCookie", "AuthService", function($scope, $http, $window, ipCookie, AuthService) {
+	if(!AuthService.loggedIn()) {
+		$window.location.href="index.html"
+		return;
+	}
+	
+	$scope.rooms = []
+	$http.post("app/rooms/list", AuthService.getToken()).success(function(data) {
+		$scope.rooms = data;
+	}).error(function() {
+		AuthService.logout();
+		$window.location.href="index.html";
+	});
+	
+	$scope.join = function(roomName) {
+		$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": roomName }).
+		success(function(data) {
+			$window.location.href="room.html?name=" + roomName;
+		});
+	}
+	
+	$scope.roomClicked = function(room) {
+		$scope.roomName = room.name;
+	}
+}]);
+</script>
+<div class="row" ng-hide="!rooms" ng-controller="LobbyController">
+	<h2 class="text-center">Lobby</h2>
+	<table class="table table-striped room-list">
+		<tr>
+			<th>Room</th>
+			<th>#Users</th>
+		</tr>
+		<tr ng-repeat="room in rooms" style="cursor: pointer;" ng-click="roomClicked(room)">
+			<td>{{room.name}}</td>
+			<td>{{room.numUsers}}</td>
+		</tr>
+	</table>
+	<form class="form-signin" role="form">
+		<input type="text" class="form-control" placeholder="Room name" required autofocus ng-model="roomName">			
+		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="join(roomName)">Join/Create Room</button>		
+	</form>	
+		
+</div>
+<include>templates/footer.html</include>

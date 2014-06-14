@@ -1,3 +1,4 @@
+- volume slider
 - disallow multi-connect
 - remove user from room on disconnect (browser/tab close, url change, etc.)
 - private channels

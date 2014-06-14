@@ -1,0 +1,3 @@
+- add voting (must be more than 50% for a switch)
+- display next DJ and her song
+- display list of users, mark current user

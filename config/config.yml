@@ -1,6 +1,6 @@
 http:
-  port: 8080
-  adminPort: 8081
+  port: 7778
+  adminPort: 7779
   rootPath: /app/*
   requestLog:
     console:

@@ -206,6 +206,9 @@ public class Rooms {
 				}
 				if(vote < 0) {
 					room.negativeVotes++;
+					if(room.currentSong != null && room.currentSong.user.equals(user.name)) {
+						room.negativeVotes = room.users.size() * 2;
+					}
 				}
 				if(vote > 0) {
 					room.positiveVotes++;

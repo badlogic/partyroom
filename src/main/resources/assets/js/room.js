@@ -176,8 +176,8 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 		player.loadVideoById(id, offset);		
 	}
 	
-	$scope.getOffset = function() {
-		if(!$scope.room.currentSong.youtubeId) return 0;
+	$scope.getOffset = function() {		
+		if(!$scope.room.currentSong || $scope.room.currentSong.youtubeId) return 0;
 		return Math.floor((new Date().getTime() - new Date($scope.room.startTime).getTime()) / 1000);
 	}
 	

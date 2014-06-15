@@ -57,6 +57,8 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
 	success(function(data) {		
 		$scope.update(0);
+	}).error(function() {
+		$window.location.href="lobby.html";
 	});
 	
 	$scope.sendMessage = function() {

@@ -57,6 +57,7 @@ public class RoomResource {
 	public Room update(UpdateRequest req) {
 		User user = users.getUser(req.userId);
 		if(user == null) throw new WebApplicationException(Status.FORBIDDEN);
+		user.lastUpdate = System.nanoTime();
 		if(!req.roomName.equals(user.roomName)) return rooms.join(req.roomName, user);
 		else return rooms.getStatus(req.roomName);
 	}

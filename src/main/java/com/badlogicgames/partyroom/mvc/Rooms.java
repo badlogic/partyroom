@@ -2,6 +2,7 @@ package com.badlogicgames.partyroom.mvc;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,9 +97,16 @@ public class Rooms {
 			if(oldRoom != null) {
 				synchronized(oldRoom) {
 					oldRoom.users.remove(user);
+					
+					Message msg = new Message();
+					msg.message = "User " + user.name + " quit";
+					msg.utcTimeStamp = new Date().getTime();
+					msg.userName = null;
+					oldRoom.messages.add(msg);
+					
 					if(oldRoom.users.size() == 0) {
 						synchronized(rooms) {
-							rooms.remove(oldRoom.name);
+							rooms.remove(oldRoom.name);							
 						}
 					}
 				}
@@ -134,9 +142,14 @@ public class Rooms {
 					room.messages.add(msg);
 				}
 				
-				for(User user: room.users) {
+				List<User> usersToRemove = new ArrayList<>();				
+				for(User user: room.users) {					
 					user.lastVote = 0;
+					if(System.nanoTime() - user.lastUpdate > 10000000000l) {
+						usersToRemove.add(user);
+					}
 				}
+				for(User user: usersToRemove) leave(user);
 				room.positiveVotes = 0;
 				room.negativeVotes = 0;
 			}

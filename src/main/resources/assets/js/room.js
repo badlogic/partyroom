@@ -76,7 +76,8 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 			success(function(data) {
 				if(player) {					
 					// we may get a null song, create an empty one in that case
-					if(!data.currentSong) data.currentSong = { youtubeId: null, user: null };								
+					if(!data.currentSong) data.currentSong = { youtubeId: null, user: null };	
+					if(!$scope.room.currentSong) $scope.room.currentSong = { youtubeId: null, user: null };
 					
 					// if the song changed
 					if(data.currentSong.youtubeId !== $scope.room.currentSong.youtubeId) {

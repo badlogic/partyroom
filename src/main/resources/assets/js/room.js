@@ -78,66 +78,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 			});
 			$scope.update(2000);
 		}, timeout);
-	}
-	
-	$scope.updateSong = function() {
-		if($scope.playList.length == 0) {
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "song": null });
-		} else {
-			var song = $scope.playList[0];
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), 
-										   "song": { "user": AuthService.getUserName(), "duration": song.duration, "youtubeId": song.id, "thumbnail": song.thumbnail, "title": song.title}});
-		}
-	}
-	
-	$scope.addSong = function(song) {
-		$scope.isSearching = false; 
-		if($.inArray(song, $scope.playList) != -1) return;		
-		$scope.playList.push(song);
-		$scope.updateSong();
-	}
-	
-	$scope.search = function () {
-	      $http.get('https://www.googleapis.com/youtube/v3/search', {
-	        params: {
-	          key: $scope.room.youtubeKey,
-	          type: 'video',
-	          maxResults: '10',
-	          part: 'id,snippet',
-	          fields: 'items/id,items/snippet/title,items/snippet/description,items/snippet/thumbnails/default,items/snippet/channelTitle',
-	          q: $scope.query
-	        }
-	      })
-	      .success( function (data) {
-    	    var results = [];
-    	    var ids = "";
-    	    for (var i = data.items.length - 1; i >= 0; i--) {
-    	    	var result = {
-    	    	    user: AuthService.getUserName(),
-    	    		id: data.items[i].id.videoId,
-	    	        title: data.items[i].snippet.title,
-	    	        description: data.items[i].snippet.description,
-	    	        thumbnail: data.items[i].snippet.thumbnails.default.url,
-	    	        author: data.items[i].snippet.channelTitle
-    	    	};
-    	    	results.push(result);
-    	    	ids += result.id + ",";
-    	    }
-    	    $http.get("https://www.googleapis.com/youtube/v3/videos", {
-    	    	params: {
-    	    		key: $scope.room.youtubeKey,
-    	    		id: ids,
-    	    		part: "contentDetails"
-    	    	}
-    	    }).success(function(data) {
-    	    	for(var i = 0; i < results.length; i++) {
-    	    		results[i].duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
-    	    	}
-    	    	$scope.searchResults = results;
-    			$timeout(function() { document.getElementById("chatlist").scrollTop = 0; }, 0);
-    	    });
-	      })  
-	}
+	}		
 	
 	$scope.isPlaying = function() {
 		return player.getPlayerState() >= 1 && player.getPlayerState() <= 3;
@@ -162,21 +103,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.currentUser = function() {
 		if($scope.room.users.length == 0) return null;
 		return $scope.room.users[$scope.room.currentUser].name;
-	}
-	
-	$scope.nextSong = function() {
-		if($scope.room.users.length == 0) return null;
-		var idx = $scope.room.currentUser + 1;
-		if(idx >= $scope.room.users.length) idx = 0;
-		return $scope.room.users[idx].song;
-	}
-	
-	$scope.nextUser = function() {
-		if($scope.room.users.length == 0) return null;
-		var idx = $scope.room.currentUser + 1;
-		if(idx >= $scope.room.users.length) idx = 0;
-		return $scope.room.users[idx].name;
-	}
+	}		
 	
 	$scope.getVolume = function() {
 		if(!player) return 0;
@@ -190,6 +117,65 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 		} else {
 			player.setVolume(0);
 		}
+	}
+	
+	$scope.search = function () {
+	      $http.get('https://www.googleapis.com/youtube/v3/search', {
+	        params: {
+	          key: $scope.room.youtubeKey,
+	          type: 'video',
+	          maxResults: '10',
+	          part: 'id,snippet',
+	          fields: 'items/id,items/snippet/title,items/snippet/description,items/snippet/thumbnails/default,items/snippet/channelTitle',
+	          q: $scope.query
+	        }
+	      })
+	      .success( function (data) {
+  	    var results = [];
+  	    var ids = "";
+  	    for (var i = data.items.length - 1; i >= 0; i--) {
+  	    	var result = {
+  	    	    user: AuthService.getUserName(),
+  	    		id: data.items[i].id.videoId,
+	    	        title: data.items[i].snippet.title,
+	    	        description: data.items[i].snippet.description,
+	    	        thumbnail: data.items[i].snippet.thumbnails.default.url,
+	    	        author: data.items[i].snippet.channelTitle
+  	    	};
+  	    	results.push(result);
+  	    	ids += result.id + ",";
+  	    }
+  	    $http.get("https://www.googleapis.com/youtube/v3/videos", {
+  	    	params: {
+  	    		key: $scope.room.youtubeKey,
+  	    		id: ids,
+  	    		part: "contentDetails"
+  	    	}
+  	    }).success(function(data) {
+  	    	for(var i = 0; i < results.length; i++) {
+  	    		results[i].duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
+  	    	}
+  	    	$scope.searchResults = results;
+  			$timeout(function() { document.getElementById("chatlist").scrollTop = 0; }, 0);
+  	    });
+	      })  
+	}
+	
+	$scope.updateSong = function() {
+		if($scope.playList.length == 0) {
+			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "song": null });
+		} else {
+			var song = $scope.playList[0];
+			$http.post("app/rooms/song", { "userId": AuthService.getToken(), 
+										   "song": { "user": AuthService.getUserName(), "duration": song.duration, "youtubeId": song.id, "thumbnail": song.thumbnail, "title": song.title}});
+		}
+	}
+	
+	$scope.addSong = function(song) {
+		$scope.isSearching = false; 
+		if($.inArray(song, $scope.playList) != -1) return;		
+		$scope.playList.push(song);
+		$scope.updateSong();
 	}
 	
 	$scope.removeSong = function(song) {

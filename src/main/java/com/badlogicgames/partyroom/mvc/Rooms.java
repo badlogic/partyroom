@@ -120,8 +120,7 @@ public class Rooms {
 		Objects.requireNonNull(roomName, "room name may not be null");
 
 		Room room = rooms.get(roomName);
-		synchronized(room) {
-			room.playedTime = (new Date().getTime() - room.startTime) / 1000;
+		synchronized(room) {			
 			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
 				room.currentUser++;
 				if(room.currentUser >= room.users.size()) room.currentUser = 0;
@@ -153,6 +152,7 @@ public class Rooms {
 				room.positiveVotes = 0;
 				room.negativeVotes = 0;
 			}
+			room.playedTime = (new Date().getTime() - room.startTime) / 1000;
 		}
 		return room;
 	}

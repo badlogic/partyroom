@@ -26,11 +26,10 @@
 	  			<h4>Now Playing <span style="color: #f00;">{{currentUser()}}'s</span> song!</h4>	  				  			
   				<div ng-hide="!currentSong().title">
 				  	<strong>Title: </strong>{{currentSong().title}}</br>
-					<span><strong>Time: </strong>{{getOffset()}}/{{currentSong().duration}} secs</br></span>
-					<i class="fa fa-2x fa-volume-up pointer" ng-hide="getVolume() === 0" ng-click="toggleVolume()"></i>
-					<i class="fa fa-2x fa-volume-down pointer" ng-hide="getVolume() === 100" ng-click="toggleVolume()"></i>					
+					<span><strong>Time: </strong>{{getOffset()}}/{{currentSong().duration}} secs</br></span>									
 					<i class="fa fa-thumbs-o-up fa-2x pointer" ng-click="upvote()"></i> {{room.positiveVotes}} 				
-					<i class="fa fa-thumbs-o-down fa-2x pointer" ng-click="downvote()"></i> {{room.negativeVotes}} 
+					<i class="fa fa-thumbs-o-down fa-2x pointer" ng-click="downvote()"></i> {{room.negativeVotes}}
+					<strong>Upvote for <3, downvote to skip!</strong> 
 				</div>
 				<div ng-hide="currentSong().title">
 					No songs in playlist

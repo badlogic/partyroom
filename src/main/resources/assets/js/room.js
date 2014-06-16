@@ -1,7 +1,7 @@
 var player = null;
 var params = { allowScriptAccess: "always", autohide: 1 };
 var atts = { id: "myytplayer" };
-swfobject.embedSWF("http://www.youtube.com/apiplayer?enablejsapi=1&playerapiid=ytplayer&version=3",
+swfobject.embedSWF("http://www.youtube.com/v/cdwal5Kw3Fc?enablejsapi=1&playerapiid=ytplayer&version=3",
                    "ytapiplayer", "640", "480", "8", null, null, params, atts);
 
 function onYouTubePlayerReady(id) {
@@ -103,21 +103,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.currentUser = function() {
 		if($scope.room.users.length == 0) return null;
 		return $scope.room.users[$scope.room.currentUser].name;
-	}		
-	
-	$scope.getVolume = function() {
-		if(!player) return 0;
-		return player.getVolume();
-	}
-	
-	$scope.toggleVolume = function() {
-		if(!player) return;
-		if(player.getVolume() == 0) {
-			player.setVolume(100);
-		} else {
-			player.setVolume(0);
-		}
-	}
+	}	
 	
 	$scope.search = function () {
 	      $http.get('https://www.googleapis.com/youtube/v3/search', {

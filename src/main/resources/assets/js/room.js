@@ -138,8 +138,11 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
   	    		part: "contentDetails"
   	    	}
   	    }).success(function(data) {
-  	    	for(var i = 0; i < results.length; i++) {
-  	    		results[i].duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
+  	    	var newResults = [];
+  	    	for(var i = 0; i < data.length; i++) {
+  	    		var result = results[i];
+  	    		newResults.push(result);
+  	    		result.duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
   	    	}
   	    	$scope.searchResults = results;
   			$timeout(function() { document.getElementById("chatlist").scrollTop = 0; }, 0);

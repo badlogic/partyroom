@@ -1,4 +1,4 @@
-- volume slider
+- logout
 - disallow multi-connect
 - private channels
 - limited channels (admin can set who can enqueue and who can't)

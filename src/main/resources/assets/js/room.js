@@ -1,11 +1,27 @@
 var player = null;
-var params = { allowScriptAccess: "always", autohide: 1 };
-var atts = { id: "myytplayer" };
-swfobject.embedSWF("http://www.youtube.com/v/cdwal5Kw3Fc?enablejsapi=1&playerapiid=ytplayer&version=3",
-                   "ytapiplayer", "640", "480", "8", null, null, params, atts);
+//var params = { allowScriptAccess: "always", autohide: 1 };
+//var atts = { id: "myytplayer" };
+//swfobject.embedSWF("http://www.youtube.com/v/cdwal5Kw3Fc?enablejsapi=1&playerapiid=ytplayer&version=3",
+//                   "ytapiplayer", "640", "480", "8", null, null, params, atts);
 
-function onYouTubePlayerReady(id) {
-	player = document.getElementById("myytplayer");
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+function onYouTubeIframeAPIReady() {
+	new YT.Player('player', {
+        height: '480',
+        width: '640',
+        videoId: 'cdwal5Kw3Fc',
+        events: {
+          'onReady': onPlayerReady,          
+        }
+      });
+}
+
+function onPlayerReady(event) {
+	player = event.target;
 }
 
 app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$timeout", "ipCookie", "AuthService", function($scope, $http, $location, $window, $timeout, ipCookie, AuthService) {

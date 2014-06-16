@@ -139,7 +139,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
   	    	}
   	    }).success(function(data) {
   	    	var newResults = [];
-  	    	for(var i = 0; i < data.length; i++) {
+  	    	for(var i = 0; i < data.items.length; i++) {
   	    		var result = results[i];
   	    		newResults.push(result);
   	    		result.duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);

@@ -152,7 +152,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	
 	$scope.getOffset = function() {		
 		if(!$scope.room.currentSong || !$scope.room.currentSong.youtubeId) return 0;
-		return Math.floor((new Date().getTime() - new Date($scope.room.startTime).getTime()) / 1000);
+		return $scope.room.playedTime;
 	}
 	
 	$scope.currentSong = function() {

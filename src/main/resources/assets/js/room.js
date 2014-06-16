@@ -144,7 +144,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
   	    		newResults.push(result);
   	    		result.duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
   	    	}
-  	    	$scope.searchResults = results;
+  	    	$scope.searchResults = newResults;
   			$timeout(function() { document.getElementById("chatlist").scrollTop = 0; }, 0);
   	    });
 	      })  

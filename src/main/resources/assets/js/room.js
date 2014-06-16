@@ -1,30 +1,3 @@
-function getUrlParameter(sParam) {
-	var sPageURL = window.location.search.substring(1);
-	var sURLVariables = sPageURL.split('&');
-	for (var i = 0; i < sURLVariables.length; i++) {
-		var sParameterName = sURLVariables[i].split('=');
-		if (sParameterName[0] == sParam) {
-			return sParameterName[1];
-		}
-	}	
-}
-
-Array.prototype.move = function (old_index, new_index) {
-    if (new_index >= this.length) {
-        var k = new_index - this.length;
-        while ((k--) + 1) {
-            this.push(undefined);
-        }
-    }
-    this.splice(new_index, 0, this.splice(old_index, 1)[0]);
-    return this; // for testing purposes
-};
-
-function shuffle(o){ //v1.0
-    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-    return o;
-};
-
 var player = null;
 var params = { allowScriptAccess: "always", autohide: 1 };
 var atts = { id: "myytplayer" };
@@ -44,7 +17,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.playList = [];
 	$scope.roomName = getUrlParameter("name");
 	$scope.searchResults = [];
-	$scope.room = { users: [], currentSong: { id: null, user: null }, startTime: 0 };
+	$scope.room = { users: [], currentSong: { id: null, user: null }, startTime: 0, playedTime: 0 };
 	
 	if(!$scope.roomName) {
 		$window.location.href="index.html";
@@ -83,7 +56,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 					if(data.currentSong.youtubeId !== $scope.room.currentSong.youtubeId) {
 						// playback the new video
 						if(data.currentSong.youtubeId) {							
-							$scope.playVideo(data.currentSong.youtubeId, data.startTime);
+							$scope.playVideo(data.currentSong.youtubeId, data.playedTime, data.currentSong.duration);
 						} else {
 							player.stopVideo();
 						}
@@ -170,15 +143,15 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 		return player.getPlayerState() >= 1 && player.getPlayerState() <= 3;
 	}
 	
-	$scope.playVideo = function(id, startTime) {
-		var offset = (new Date().getTime() - new Date(startTime).getTime()) / 1000
-		console.log("playing video " + id + ", " + offset);
-		if(offset < 0) offset = 0;
-		player.loadVideoById(id, offset);		
+	$scope.playVideo = function(id, startTime, duration) {	
+		if(startTime < 0) startTime = 0;
+		if(startTime > duration) startTime = duration;
+		console.log("playing video " + id + ", " + startTime);		
+		player.loadVideoById(id, startTime);		
 	}
 	
 	$scope.getOffset = function() {		
-		if(!$scope.room.currentSong || $scope.room.currentSong.youtubeId) return 0;
+		if(!$scope.room.currentSong || !$scope.room.currentSong.youtubeId) return 0;
 		return Math.floor((new Date().getTime() - new Date($scope.room.startTime).getTime()) / 1000);
 	}
 	

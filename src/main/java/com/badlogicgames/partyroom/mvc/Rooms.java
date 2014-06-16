@@ -2,7 +2,6 @@ package com.badlogicgames.partyroom.mvc;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -122,6 +121,7 @@ public class Rooms {
 
 		Room room = rooms.get(roomName);
 		synchronized(room) {
+			room.playedTime = (new Date().getTime() - room.startTime) / 1000;
 			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
 				room.currentUser++;
 				if(room.currentUser >= room.users.size()) room.currentUser = 0;

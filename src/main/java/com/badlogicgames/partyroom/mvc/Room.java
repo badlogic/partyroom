@@ -10,7 +10,8 @@ public class Room {
 	public List<Message> messages = new Vector<Message>(); // -- "" --
 	public int currentUser;
 	public Item currentSong;
-	public long startTime; // start time in UTC	
+	public long startTime; // start time in UTC
+	public long playedTime; // number of seconds played of the song
 	public long switchTime; // time at which we switch to the next user/song, server system time
 	public String youtubeKey;
 	public int positiveVotes;

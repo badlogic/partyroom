@@ -1,3 +1,6 @@
+- login without signup ala IRC
+- history of videos played in the room
+- make urls clickable in chat
 - logout
 - disallow multi-connect
 - private channels

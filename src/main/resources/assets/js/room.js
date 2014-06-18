@@ -1,9 +1,4 @@
 var player = null;
-//var params = { allowScriptAccess: "always", autohide: 1 };
-//var atts = { id: "myytplayer" };
-//swfobject.embedSWF("http://www.youtube.com/v/cdwal5Kw3Fc?enablejsapi=1&playerapiid=ytplayer&version=3",
-//                   "ytapiplayer", "640", "480", "8", null, null, params, atts);
-
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -24,31 +19,25 @@ function onPlayerReady(event) {
 	player = event.target;
 }
 
-app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$timeout", "ipCookie", "AuthService", function($scope, $http, $location, $window, $timeout, ipCookie, AuthService) {
-	if(!AuthService.loggedIn()) {
-		$window.location.href="index.html"
-		return;
-	};
-	
+app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$timeout", "$modal", "ipCookie", "AuthService", 
+                          function($scope, $http, $location, $window, $timeout, $modal, ipCookie, AuthService) {
 	$scope.playList = [];
 	$scope.roomName = getUrlParameter("name");
 	$scope.searchResults = [];
 	$scope.room = { users: [], currentSong: { id: null, user: null }, startTime: 0, playedTime: 0 };
 	
-	if(!$scope.roomName) {
-		$window.location.href="index.html";
-		return;
-	} else {
-		$scope.roomName = decodeURIComponent($scope.roomName);
+	// scroll to bottom for login/join flow	
+
+	$scope.join = function() {
+		// join the room and start the heartbeat
+		$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
+		success(function(data) {		
+			$scope.update(0);
+		}).error(function() {
+			AuthService.logout();
+			$window.location.href="index.html";
+		});
 	}
-	
-	// join the room and start the heartbeat
-	$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
-	success(function(data) {		
-		$scope.update(0);
-	}).error(function() {
-		$window.location.href="lobby.html";
-	});
 	
 	$scope.sendMessage = function() {
 		$http.post("app/rooms/message", { userId: AuthService.getToken(), roomName: $scope.roomName, message: $scope.message}).
@@ -224,5 +213,26 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 			userId: AuthService.getToken(),
 			vote: -1
 		});
+	}
+	
+	if(!$scope.roomName) {
+		$window.location.href="index.html";
+		return;
+	} else {
+		$scope.roomName = decodeURIComponent($scope.roomName);
+	}	
+	
+	// we aren't signed in, ask for sign in/up before joining
+	if(!AuthService.loggedIn()) {
+		var modalInstance = $modal.open({
+			templateUrl: 'identityModal.html",
+			controller: {
+				
+			},
+			size: size			
+		})
+		return;
+	} else {
+		$scope.join();
 	}
 }]);

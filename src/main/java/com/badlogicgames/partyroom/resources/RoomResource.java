@@ -48,7 +48,8 @@ public class RoomResource {
 	@Path("list")
 	public List<RoomDescriptor> list(String userId) {
 		User user = users.getUser(userId);
-		if(user == null) throw new WebApplicationException(Status.FORBIDDEN);
+		// TODO user may be null if the user isn't logged in
+		// could react to that
 		return rooms.listRooms();
 	}
 	

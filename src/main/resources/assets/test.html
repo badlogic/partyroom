@@ -5,9 +5,9 @@
 <meta content='text/html; charset=utf-8' http-equiv='content-type'>
 <meta content='initial-scale=1.0' name='viewport'>
 <meta content='en_US' property='og:locale'>
-<meta content="Party Room - good times" property='og:title'>
+<meta content="PartyRoom - good times" property='og:title'>
 <meta content='http://partyroom.badlogicgames.com' property='og:url'>
-<meta content='Party Room, good times' property='og:description'>
+<meta content='PartyRoom, good times' property='og:description'>
 <link href='/img/favicon.png' rel='shortcut icon'>
 <title>PartyRoom - good times</title>
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
@@ -17,12 +17,11 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-<script src="js/ui-bootstrap-0.11.0.min.js"></script>
 <script src="js/angular-cookie.min.js"></script>
 <script src="js/utils.js"></script>
 
 <script>
-var app = angular.module("PartyRoom", ["ivpusic.cookie", 'ui.bootstrap']);
+var app = angular.module("PartyRoom", ["ivpusic.cookie"]);
 </script>
 </head>
 
@@ -35,18 +34,6 @@ var app = angular.module("PartyRoom", ["ivpusic.cookie", 'ui.bootstrap']);
 
 <div class="container">
 
-<nav class="navbar navbar-default" role="navigation" ng-controller="NavBarController">
-  <div class="container-fluid">   
-      <ul class="nav navbar-nav navbar-right" ng-hide="authService.loggedIn()">
-        <li><a href="login.html">Login/Signup</a></li>        
-      </ul> 
-      <ul class="nav navbar-nav navbar-right" ng-hide="!authService.loggedIn()">
-        <li ng-click="logout()"><a href="#">Logout</a></li>        
-      </ul>  
-  </div>
-</nav>
-
-<div class="row">
-	<h2 class="text-center logo">Party Room</h2>
-	<h2 class="text-center logo-small">♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪</h2>
 </div>
+</body>
+</html>

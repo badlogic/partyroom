@@ -63,3 +63,12 @@ app.service("AuthService", ["$http", "ipCookie", function($http, ipCookie) {
 		})
 	}
 }]);
+
+app.controller("NavBarController", ["$scope", "$window", "AuthService", function($scope, $window, AuthService) {
+	$scope.authService = AuthService;
+	
+	$scope.logout = function() {
+		AuthService.logout();
+		$window.location.href="index.html";
+	}
+}]);

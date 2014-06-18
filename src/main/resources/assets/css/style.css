@@ -1,6 +1,4 @@
-body {
-  padding-top: 40px;
-  padding-bottom: 40px;
+body {  
   background-color: #eee;
 }
 
@@ -12,6 +10,11 @@ body {
 .logo-small {
 	font-family: "Lato", "Open Sans";
 	font-size: 20px;
+}
+
+.partyroom-navbar {
+	border: 0px;
+	background-color: #eee;
 }
 
 .form-signin {

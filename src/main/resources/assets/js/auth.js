@@ -109,7 +109,8 @@ app.service("AuthService", ["$http", "$modal", "ipCookie", function($http, $moda
 					$modalInstance.dismiss('cancel');
 					if(cancelCallback) cancelCallback();
 				}
-			}
+			},
+			keyboard: false
 		});			
 	}
 	

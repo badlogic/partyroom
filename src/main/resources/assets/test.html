@@ -1,15 +1,6 @@
 <!doctype html>
-<html ng-app="PartyRoom">
-<head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content='text/html; charset=utf-8' http-equiv='content-type'>
-<meta content='initial-scale=1.0' name='viewport'>
-<meta content='en_US' property='og:locale'>
-<meta content="PartyRoom - good times" property='og:title'>
-<meta content='http://partyroom.badlogicgames.com' property='og:url'>
-<meta content='PartyRoom, good times' property='og:description'>
-<link href='/img/favicon.png' rel='shortcut icon'>
-<title>PartyRoom - good times</title>
+<html ng-app="plunker">
+  <head>
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -17,23 +8,82 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="js/ui-bootstrap-0.11.0.js"></script>
 <script src="js/angular-cookie.min.js"></script>
 <script src="js/utils.js"></script>
+    <script>
+angular.module('plunker', ['ui.bootstrap']);
+var ModalDemoCtrl = function ($scope, $modal, $log) {
 
-<script>
-var app = angular.module("PartyRoom", ["ivpusic.cookie"]);
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.open = function (size) {
+
+    var modalInstance = $modal.open({
+      templateUrl: 'myModalContent.html',
+      controller: ModalInstanceCtrl,
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+};
+
+// Please note that $modalInstance represents a modal window (instance) dependency.
+// It is not the same as the $modal service used above.
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, items) {
+
+  $scope.items = items;
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};
 </script>
-</head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
 
-<!-- auth -->
-<script src="js/auth.js"></script>
+<div ng-controller="ModalDemoCtrl">
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">I'm a modal!</h3>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li ng-repeat="item in items">
+                    <a ng-click="selected.item = item">{{ item }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
 
-<!-- Style -->
-<link rel="stylesheet" href="css/style.css">
-<body>
-
-<div class="container">
-
+    <button class="btn btn-default" ng-click="open()">Open me!</button>
+    <button class="btn btn-default" ng-click="open('lg')">Large modal</button>
+    <button class="btn btn-default" ng-click="open('sm')">Small modal</button>
+    <div ng-show="selected">Selection from a modal: {{ selected }}</div>
 </div>
-</body>
+  </body>
 </html>

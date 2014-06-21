@@ -31,13 +31,52 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	$scope.join = function() {
 		// join the room and start the heartbeat
 		$http.post("app/rooms/join", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
-		success(function(data) {		
+		success(function(data) {
+			$scope.processUpdate(data);
 			$scope.update(0);
 		}).error(function() {
 			AuthService.logout();
 			$window.location.href="index.html";
 		});
+	}	
+	
+	$scope.processUpdate = function(data) {
+		// we may get a null song, create an empty one in that case
+		if(!data.currentSong) data.currentSong = { youtubeId: null, user: null };	
+		if(!$scope.room.currentSong) $scope.room.currentSong = { youtubeId: null, user: null };
+		
+		// if the song changed
+		if(data.currentSong.youtubeId !== $scope.room.currentSong.youtubeId) {
+			// playback the new video
+			if(data.currentSong.youtubeId) {							
+				$scope.playVideo(data.currentSong.youtubeId, data.playedTime, data.currentSong.duration);
+			} else {
+				if(player) player.stopVideo();
+			}
+			
+			// update the playlist if the currently playing song is ours
+			if($scope.playList.length > 0 &&
+			   $scope.playList[0].id === data.currentSong.youtubeId &&
+			   $scope.playList[0].user === data.currentSong.user) {
+				$scope.playList.shift();
+				$scope.updateSong();
+			}
+		}
+		$scope.room = data;
 	}
+	
+	$scope.update = function(timeout) {
+		$timeout(function() {
+			$http.post("app/rooms/update", { "roomName": $scope.roomName, "userId": AuthService.getToken() }).
+			success(function(data) {								
+				$scope.processUpdate(data)
+				$timeout(function() { document.getElementById("chatlist").scrollTop = 99999999; }, 0);		
+			}).error(function() {
+				$window.location.href="index.html";
+			});
+			$scope.update(2000);
+		}, timeout);
+	}	
 	
 	$scope.sendMessage = function() {
 		$http.post("app/rooms/message", { userId: AuthService.getToken(), roomName: $scope.roomName, message: $scope.message}).
@@ -48,48 +87,13 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 		$scope.message = "";
 	};
 	
-	$scope.update = function(timeout) {
-		$timeout(function() {
-			$http.post("app/rooms/update", { "roomName": $scope.roomName, "userId": AuthService.getToken() }).
-			success(function(data) {
-				if(player) {					
-					// we may get a null song, create an empty one in that case
-					if(!data.currentSong) data.currentSong = { youtubeId: null, user: null };	
-					if(!$scope.room.currentSong) $scope.room.currentSong = { youtubeId: null, user: null };
-					
-					// if the song changed
-					if(data.currentSong.youtubeId !== $scope.room.currentSong.youtubeId) {
-						// playback the new video
-						if(data.currentSong.youtubeId) {							
-							$scope.playVideo(data.currentSong.youtubeId, data.playedTime, data.currentSong.duration);
-						} else {
-							player.stopVideo();
-						}
-						
-						// update the playlist if the currently playing song is ours
-						if($scope.playList.length > 0 &&
-						   $scope.playList[0].id === data.currentSong.youtubeId &&
-						   $scope.playList[0].user === data.currentSong.user) {
-							$scope.playList.shift();
-							$scope.updateSong();
-						}
-					}
-					
-					$scope.room = data;					
-					$timeout(function() { document.getElementById("chatlist").scrollTop = 99999999; }, 0);				
-				}				
-			}).error(function() {
-				$window.location.href="index.html";
-			});
-			$scope.update(2000);
-		}, timeout);
-	}		
-	
 	$scope.isPlaying = function() {
+		if(!player) return false;
 		return player.getPlayerState() >= 1 && player.getPlayerState() <= 3;
 	}
 	
-	$scope.playVideo = function(id, startTime, duration) {	
+	$scope.playVideo = function(id, startTime, duration) {
+		if(!player) return;
 		if(startTime < 0) startTime = 0;
 		if(startTime > duration) startTime = duration;
 		console.log("playing video " + id + ", " + startTime);		
@@ -223,15 +227,14 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}	
 	
 	// we aren't signed in, ask for sign in/up before joining
-	if(!AuthService.loggedIn()) {
-		var modalInstance = $modal.open({
-			templateUrl: 'identityModal.html",
-			controller: {
-				
-			},
-			size: size			
-		})
-		return;
+	if(!AuthService.loggedIn()) {			
+		AuthService.showLoginDialog(function() {
+			$scope.join();
+		}, function() {
+			$scope.join();
+		}, function() {
+			$window.location.href = "index.html";
+		});
 	} else {
 		$scope.join();
 	}

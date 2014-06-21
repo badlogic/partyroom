@@ -1,20 +1,10 @@
 <include>templates/header.html</include>
 
-<script type="text/ng-template" id="identifyModal.html">
-	<form class="form-signin" role="form" ng-show="loginData">
-		<div ng-show="error" class="alert alert-danger">{{errorMessage}}</div>
-		<input type="text" class="form-control" placeholder="User name" required autofocus ng-model="loginData.name">
-		<input type="password" class="form-control" placeholder="Password" required ng-model="loginData.password">
-		<label class="checkbox"> <input type="checkbox" value="remember-me" ng-model="keepLogin">Remember me</label>
-		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="login()">Login</button>
-		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="signup()">Sign up</button>
-	</form>
-</script>
-
 <script src="js/iso8601.min.js"></script>
 <script src="js/room.js"></script>
 
-<div ng-controller="RoomController">			
+
+<div ng-controller="RoomController">	
 	<div class="row">		
 		<!-- video player -->
 		<div class="col-md-7 nopadding">			

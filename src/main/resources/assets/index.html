@@ -3,6 +3,7 @@
 <script>
 app.controller("LobbyController", ["$scope", "$http", "$window", "ipCookie", "AuthService", function($scope, $http, $window, ipCookie, AuthService) {	
 	$scope.rooms = []
+	$scope.roomName = "";
 	$http.post("app/rooms/list", AuthService.getToken()).success(function(data) {
 		$scope.rooms = data;
 	}).error(function() {
@@ -33,7 +34,7 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "ipCookie", "Au
 	</table>
 	<form class="form-signin" role="form">
 		<input type="text" class="form-control" placeholder="Room name" required autofocus ng-model="roomName">			
-		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="join(roomName)">Join/Create Room</button>		
+		<button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="join(roomName)" ng-disabled="roomName.length === 0">Join/Create Room</button>		
 	</form>	
 		
 </div>

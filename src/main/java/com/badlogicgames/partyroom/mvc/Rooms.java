@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * some race conditions while locking at a very fine-grained level.
  */
 public class Rooms {	
+	private static final long HEART_BEAT = 10000000000l;
+	private static final long DELAY_BETWEEN_SONGS = 4000000000l;
 	private final Map<String, Room> rooms = new ConcurrentHashMap<>();
 	private final String youtubeKey;
 	
@@ -120,37 +122,54 @@ public class Rooms {
 		Objects.requireNonNull(roomName, "room name may not be null");
 
 		Room room = rooms.get(roomName);
-		synchronized(room) {			
+		synchronized(room) {
+			// time to switch the song, cause the current one has ended or +50% of users downvoted it 
 			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
+				// check if there are any users that haven't been calling us
+				// for a while (10 seconds == HEART_BEAT) and remove them
+				// from the room if that's the case. We do this here, so a
+				// user may get disconnected only after the current song is 
+				// done/skipped!
+				List<User> usersToRemove = new ArrayList<>();				
+				for(User user: room.users) {					
+					user.lastVote = 0;
+					if(System.nanoTime() - user.lastUpdate > HEART_BEAT) {
+						usersToRemove.add(user);
+					}
+				}
+				for(User user: usersToRemove) {
+					leave(user);
+				}		
+				
+				// reset the votes for the new song
+				room.positiveVotes = 0;
+				room.negativeVotes = 0;
+				
+				// move to the next user, this assumes that there's at least one user in the room!
 				room.currentUser++;
 				if(room.currentUser >= room.users.size()) room.currentUser = 0;
+				
+				// get the current song of the current user
 				room.currentSong = room.users.get(room.currentUser).song;
 				room.users.get(room.currentUser).song = null;
+				
+				// calculate when the song has started in UTC, as well as when to switch to the next song, in server time
+				// we use a delay of 4 seconds between songs.
 				room.startTime = room.currentSong == null? 0: new Date().getTime();
 				if(room.currentSong != null) {
-					room.switchTime = System.nanoTime() + room.currentSong.duration * 1000000000l + 4000000000l;
+					room.switchTime = System.nanoTime() + room.currentSong.duration * 1000000000l + DELAY_BETWEEN_SONGS;
 				} else {
 					room.switchTime = System.nanoTime() + 1000000000;
 				}
 				
+				// if this song was skipped, add a message to the chat
 				if(room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
 					Message msg = new Message();
 					msg.message = "Skipped song due to vote";
 					msg.utcTimeStamp = new Date().getTime();
 					msg.userName = null;
 					room.messages.add(msg);
-				}
-				
-				List<User> usersToRemove = new ArrayList<>();				
-				for(User user: room.users) {					
-					user.lastVote = 0;
-					if(System.nanoTime() - user.lastUpdate > 10000000000l) {
-						usersToRemove.add(user);
-					}
-				}
-				for(User user: usersToRemove) leave(user);
-				room.positiveVotes = 0;
-				room.negativeVotes = 0;
+				}										
 			}
 			room.playedTime = (new Date().getTime() - room.startTime) / 1000;
 		}

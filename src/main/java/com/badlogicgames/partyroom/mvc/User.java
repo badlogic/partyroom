@@ -7,10 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class User {
 	public String name;	
 	private String password;
-	public volatile String roomName;
-	public Item song;
-	public volatile long lastUpdate; // used for heartbeat in room
-	public volatile int lastVote; 
 	
 	@JsonIgnore
 	public String getPassword () {

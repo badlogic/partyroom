@@ -67,7 +67,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	
 	$scope.update = function(timeout) {
 		$timeout(function() {
-			$http.post("app/rooms/update", { "roomName": $scope.roomName, "userId": AuthService.getToken() }).
+			$http.post("app/rooms/update", { "userId": AuthService.getToken(), "roomName": $scope.roomName }).
 			success(function(data) {								
 				$scope.processUpdate(data)
 				$timeout(function() { document.getElementById("chatlist").scrollTop = 99999999; }, 0);		
@@ -79,7 +79,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}	
 	
 	$scope.sendMessage = function() {
-		$http.post("app/rooms/message", { userId: AuthService.getToken(), roomName: $scope.roomName, message: $scope.message}).
+		$http.post("app/rooms/message", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "message": $scope.message}).
 		success(function(data) {
 			$scope.room = data;
 			$timeout(function() { document.getElementById("chatlist").scrollTop = 99999999; }, 0);
@@ -161,10 +161,11 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	
 	$scope.updateSong = function() {
 		if($scope.playList.length == 0) {
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "song": null });
+			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "song": null });
 		} else {
 			var song = $scope.playList[0];
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), 
+			$http.post("app/rooms/song", { "userId": AuthService.getToken(),
+										   "roomName": $scope.roomName,
 										   "song": { "user": AuthService.getUserName(), "duration": song.duration, "youtubeId": song.id, "thumbnail": song.thumbnail, "title": song.title}});
 		}
 	}
@@ -207,15 +208,17 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	
 	$scope.upvote = function() {
 		$http.post("app/rooms/vote", {
-			userId: AuthService.getToken(),
-			vote: 1
+			"userId": AuthService.getToken(),
+			"roomName": $scope.roomName,
+			"vote": 1
 		});
 	}
 	
 	$scope.downvote = function() {
 		$http.post("app/rooms/vote", {
-			userId: AuthService.getToken(),
-			vote: -1
+			"userId": AuthService.getToken(),
+			"roomName": $scope.roomName,
+			"vote": -1
 		});
 	}
 	

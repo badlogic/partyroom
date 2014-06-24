@@ -56,6 +56,8 @@ public class Rooms {
 		
 		Room room = null;
 		synchronized(rooms) {
+			// create the room the user wants to join if it doesn't
+			// exist yet
 			room = rooms.get(roomName);
 			if(room == null) {
 				room = new Room();
@@ -63,23 +65,21 @@ public class Rooms {
 				room.name = roomName;
 				rooms.put(roomName, room);
 			}			
+		
+			// check if the user is already in the room
+			boolean found = false;
+			for(User otherUser: room.users) {
+				if(otherUser.name.equals(user.name)) {
+					found = true;
+					break;
+				}
+			}
+			if(!found) {			
+				room.users.add(user);
+				room.songsPerUser.put(user.name, new UserRoomData());			
+			}
 		}
 		
-		boolean found = false;
-		for(User otherUser: room.users) {
-			if(otherUser.name.equals(user.name)) {
-				found = true;
-				break;
-			}
-		}
-		if(!found) {
-			leave(user);
-			user.roomName = roomName;
-			user.lastVote = 0;
-			synchronized(room) {
-				room.users.add(user);				
-			}
-		}
 		Message msg = new Message();
 		msg.message = "User " + user.name + " joined";
 		msg.utcTimeStamp = new Date().getTime();
@@ -89,26 +89,24 @@ public class Rooms {
 	}
 	
 	/**
-	 * Removes the user from any room she's currently in.
+	 * Removes the user from the given room
 	 */
-	public void leave(User user) {
-		user.song = null;
-		if(user.roomName != null) {
-			Room oldRoom = rooms.get(user.roomName);
-			if(oldRoom != null) {
-				synchronized(oldRoom) {
-					oldRoom.users.remove(user);
-					
-					Message msg = new Message();
-					msg.message = "User " + user.name + " quit";
-					msg.utcTimeStamp = new Date().getTime();
-					msg.userName = null;
-					oldRoom.messages.add(msg);
-					
-					if(oldRoom.users.size() == 0) {
-						synchronized(rooms) {
-							rooms.remove(oldRoom.name);							
-						}
+	public void leave(User user, String roomName) {
+		Room room = rooms.get(roomName);
+		if(room != null) {
+			synchronized(room) {
+				room.users.remove(user);
+				room.songsPerUser.remove(user.name);
+				
+				Message msg = new Message();
+				msg.message = "User " + user.name + " quit";
+				msg.utcTimeStamp = new Date().getTime();
+				msg.userName = null;
+				room.messages.add(msg);
+				
+				if(room.users.size() == 0) {
+					synchronized(rooms) {
+						rooms.remove(room.name);							
 					}
 				}
 			}
@@ -118,11 +116,18 @@ public class Rooms {
 	/**
 	 * Returns the current status of the room
 	 */
-	public Room getStatus(String roomName) {
+	public Room getStatus(User user, String roomName) {
+		Objects.requireNonNull(user, "user may not be null");
 		Objects.requireNonNull(roomName, "room name may not be null");
 
 		Room room = rooms.get(roomName);
 		synchronized(room) {
+			// check if the user requesting the status of the room has
+			// actually joined the room.
+			UserRoomData userData = room.songsPerUser.get(user.name);
+			if(userData == null) throw new RuntimeException("User hasn't joined room!");
+			userData.lastUpdate = System.nanoTime();
+			
 			// time to switch the song, cause the current one has ended or +50% of users downvoted it 
 			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {
 				// check if there are any users that haven't been calling us
@@ -131,14 +136,15 @@ public class Rooms {
 				// user may get disconnected only after the current song is 
 				// done/skipped!
 				List<User> usersToRemove = new ArrayList<>();				
-				for(User user: room.users) {					
-					user.lastVote = 0;
-					if(System.nanoTime() - user.lastUpdate > HEART_BEAT) {
-						usersToRemove.add(user);
+				for(User otherUser: room.users) {
+					UserRoomData otherUserData = room.songsPerUser.get(otherUser.name);
+					otherUserData.lastVote = 0;
+					if(System.nanoTime() - otherUserData.lastUpdate > HEART_BEAT) {
+						usersToRemove.add(otherUser);
 					}
 				}
-				for(User user: usersToRemove) {
-					leave(user);
+				for(User otherUser: usersToRemove) {
+					leave(otherUser, roomName);
 				}		
 				
 				// reset the votes for the new song
@@ -150,8 +156,9 @@ public class Rooms {
 				if(room.currentUser >= room.users.size()) room.currentUser = 0;
 				
 				// get the current song of the current user
-				room.currentSong = room.users.get(room.currentUser).song;
-				room.users.get(room.currentUser).song = null;
+				UserRoomData currentUserData = room.songsPerUser.get(room.users.get(room.currentUser).name);
+				room.currentSong = currentUserData.song;
+				currentUserData.song = null;
 				
 				// calculate when the song has started in UTC, as well as when to switch to the next song, in server time
 				// we use a delay of 4 seconds between songs.
@@ -212,28 +219,30 @@ public class Rooms {
 	 * Sets the song to be played for the next user. Synchs on the room
 	 * the user is in, hence why it's in this class.
 	 */
-	public void setSong (User user, Item song) {
+	public void setSong (User user, String roomName, Item song) {
 		Objects.requireNonNull(user, "user may not be null");
+		Objects.requireNonNull(roomName, "room name may not be null");
 		
-		Room room = rooms.get(user.roomName);
+		Room room = rooms.get(roomName);
 		synchronized(room) {
-			user.song = song;
+			room.songsPerUser.get(user.name).song = song;			
 		}
 	}
 	
 	/**
 	 * Sets the vote for the user in the room she's in.
 	 */
-	public void vote(int vote, User user) {
+	public void vote(User user, String roomName, int vote) {
 		Objects.requireNonNull(user, "user may not be null");
-		Room room = rooms.get(user.roomName);
+		Room room = rooms.get(roomName);
 		synchronized(room) {
 			vote = (int)Math.signum(vote);
-			if(user.lastVote != vote) {
-				if(user.lastVote < 0) {
+			UserRoomData userData = room.songsPerUser.get(user.name);
+			if(userData.lastVote != vote) {
+				if(userData.lastVote < 0) {
 					room.negativeVotes--;					
 				}
-				if(user.lastVote > 0) {
+				if(userData.lastVote > 0) {
 					room.positiveVotes--;
 				}
 				if(vote < 0) {
@@ -246,7 +255,7 @@ public class Rooms {
 					room.positiveVotes++;
 				}
 			}
-			user.lastVote = vote;
+			userData.lastVote = vote;
 		}
 	}
 }

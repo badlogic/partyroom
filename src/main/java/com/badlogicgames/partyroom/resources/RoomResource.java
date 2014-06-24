@@ -57,10 +57,8 @@ public class RoomResource {
 	@Path("update")
 	public Room update(UpdateRequest req) {
 		User user = users.getUser(req.userId);
-		if(user == null) throw new WebApplicationException(Status.FORBIDDEN);
-		user.lastUpdate = System.nanoTime();
-		if(!req.roomName.equals(user.roomName)) return rooms.join(req.roomName, user);
-		else return rooms.getStatus(req.roomName);
+		if(user == null) throw new WebApplicationException(Status.FORBIDDEN);				
+		return rooms.getStatus(user, req.roomName);
 	}
 	
 	@POST
@@ -75,13 +73,13 @@ public class RoomResource {
 	@Path("song")
 	public void setSong(SongRequest req) {
 		User user = users.getUser(req.userId);
-		rooms.setSong(user, req.song);
+		rooms.setSong(user, req.roomName, req.song);
 	}
 	
 	@POST
 	@Path("vote")
 	public void vote(VoteRequest req) {
 		User user = users.getUser(req.userId);
-		rooms.vote(req.vote, user);
+		rooms.vote(user, req.roomName, req.vote);
 	}
 }

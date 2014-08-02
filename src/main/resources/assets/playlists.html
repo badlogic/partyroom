@@ -1,0 +1,112 @@
+<include>templates/header.html</include>
+<script src="js/iso8601.min.js"></script>
+
+<script src="js/playlists.js"></script>
+
+<style>
+.searchlist {
+	height: 400px;	
+	overflow: auto;
+}
+
+.playlist {
+	height: 400px;	
+	overflow: auto;
+}
+
+.playlists {
+	height: 400px;	
+	overflow: auto;
+}
+</style>
+
+<div class="row" ng-hide="!playLists" style="height: 100%;" ng-controller="LobbyController">
+	<h2 class="text-center">Your Playlists</h2>
+	
+	<!-- All playlists -->
+	<div class="col-md-4">
+		<div class="box">
+			<h4>
+				Your Playlists
+				<button class="btn btn-primary btn-xs" ng-click="newPlaylist()"><i class="fa fa-plus-circle"></i>New Playlist</button>
+			</h4>
+			<div class="playlists">
+				<table class="table table-striped room-list">
+					<tr>
+						<th>Playlist Name</th>
+						<th>#Songs</th>
+					</tr>
+					<tr ng-repeat="playlist in playLists" ng-click="playlistClicked(playlist)">
+						<td>{{playlist.name}}</td>
+						<td>{{playlist.items.length}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>	
+	</div>
+	
+	<!-- Currently selected playlist -->
+	<div class="col-md-8">
+		<div class="box" ng-hide="!currPlaylist">
+			<div ng-hide="isSearching">			
+				<h4>
+					Playlist '{{currPlaylist.name}}'
+					<button class="btn btn-primary btn-xs" ng-click="isSearching='youtube'"><i class="fa fa-plus-circle"></i> Add Song (Youtube)</button>
+					<button class="btn btn-primary btn-xs" ng-click="isSearching='url'"><i class="fa fa-plus-circle"></i> Add Song (URL)</button>
+					<button ng-hide="playList.length < 2" class="btn btn-primary btn-xs" ng-click="shuffleSongs()">Shuffle</button> 
+				</h4>
+				<div class="playlist">
+					<table class="table table-striped">						
+						<tr ng-repeat="song in currPlaylist.items">
+							<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+							<td><i class="fa fa-arrow-circle-up fa-2x pointer" ng-click="moveSongUp(song)"></i></br><i class="fa fa-arrow-circle-down fa-2x pointer" ng-click="moveSongDown(song)"></i></td>
+							<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+							<td><i class="fa fa-trash-o fa-2x pointer" ng-click="removeSong(song)"></i></td>
+						</tr>																						
+					</table>						
+				</div>
+			</div>
+			<div ng-show="isSearching==='youtube'">
+				<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
+				<form ng-submit="search()">				
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search songs by title, band, ..." required autofocus ng-model="query">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="submit">Search</button>
+						</span>
+					</div>
+				</form>					
+				<div class="searchlist" id="searchlist">
+					<table class="table table-striped">						
+						<tr ng-repeat="song in searchResults">
+							<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+							<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+							<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addSong(song)"></i></td>
+						</tr>																						
+					</table>
+				</div>
+			</div>
+			<div ng-show="isSearching==='url'">
+				<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
+				<form ng-submit="searchUrl()">				
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="URL to mp3, ogg, wav, ..." required autofocus ng-model="query">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="submit">Check</button>
+						</span>
+					</div>
+				</form>					
+				<div class="searchlist" id="searchlist">
+					<table class="table table-striped">						
+						<tr ng-repeat="song in searchResults">
+							<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+							<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+							<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addSong(song)"></i></td>
+						</tr>																						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<include>templates/footer.html</include>

@@ -14,9 +14,11 @@ import com.sun.jersey.spi.resource.Singleton;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 	private final Users users;
+	private final String youtubeKey;
 	
-	public UserResource(Users users) {
+	public UserResource(Users users, String youtubeKey) {
 		this.users = users;
+		this.youtubeKey = youtubeKey;
 	}
 	
 	@POST
@@ -41,5 +43,20 @@ public class UserResource {
 	@Path("getUser")
 	public User getUser(String userId) {
 		return users.getUser(userId);
-	}		
+	}
+	
+	@POST
+	@Path("getPlaylists")
+	public PlaylistsResponse getPlaylists(String userId) {
+		PlaylistsResponse response = new PlaylistsResponse();
+		response.playlists = users.getPlaylists(userId);
+		response.youtubeKey = youtubeKey;
+		return response; 
+	}
+	
+	@POST
+	@Path("updatePlaylist")
+	public void updatePlaylist(UpdatePlaylistRequest request) {
+		users.updatePlaylist(request.userId, request.playlist);
+	}
 }

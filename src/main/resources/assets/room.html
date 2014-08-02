@@ -40,7 +40,8 @@
 				<div ng-hide="isSearching">			
 					<h4>
 						Your Playlist
-						<button class="btn btn-primary btn-xs" ng-click="isSearching=true"><i class="fa fa-plus-circle"></i> Add Song</button>
+						<button class="btn btn-primary btn-xs" ng-click="isSearching='youtube'"><i class="fa fa-plus-circle"></i> Add Song (Youtube)</button>
+						<button class="btn btn-primary btn-xs" ng-click="isSearching='playlist'"><i class="fa fa-plus-circle"></i> Add Playlist</button>
 						<button ng-hide="playList.length < 2" class="btn btn-primary btn-xs" ng-click="shuffleSongs()">Shuffle</button> 
 					</h4>
 					<div class="playlist">
@@ -54,7 +55,7 @@
 						</table>						
 					</div>
 				</div>
-				<div ng-hide="!isSearching">
+				<div ng-show="isSearching==='youtube'">
 					<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
 					<form ng-submit="search()">				
 						<div class="input-group">

@@ -25,7 +25,7 @@ public class PartyRoomService extends Service<PartyRoomServiceConfiguration> {
 		Users users = new Users();
 		Rooms rooms = new Rooms(config.youtubeKey);
 		
-		env.addResource(new UserResource(users));
+		env.addResource(new UserResource(users, config.youtubeKey));
 		env.addResource(new RoomResource(rooms, users));
 	}
 	

@@ -19,4 +19,5 @@ public class Room {
 	public String youtubeKey;
 	public int positiveVotes;
 	public int negativeVotes;
+	public long lastUpdate;
 }

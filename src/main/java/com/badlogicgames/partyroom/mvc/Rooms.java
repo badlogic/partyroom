@@ -27,7 +27,9 @@ public class Rooms {
 			while(true) {
 				synchronized(rooms) {
 					for(Entry<String, Room> entry: rooms.entrySet()) {						
-						if(entry.getValue() != null && entry.getValue().users.size() == 0) {
+						if(entry.getValue() != null && 
+							(entry.getValue().users.size() == 0 ||
+							 System.nanoTime() - entry.getValue().lastUpdate > HEART_BEAT)) {
 							rooms.remove(entry.getKey());
 							System.out.println("removed room " + entry.getKey());
 						}
@@ -127,6 +129,7 @@ public class Rooms {
 			UserRoomData userData = room.songsPerUser.get(user.name);
 			if(userData == null) throw new RuntimeException("User hasn't joined room!");
 			userData.lastUpdate = System.nanoTime();
+			room.lastUpdate = System.nanoTime();
 			
 			// time to switch the song, cause the current one has ended or +50% of users downvoted it 
 			if(room.switchTime < System.nanoTime() || room.negativeVotes > Math.ceil(room.users.size() / 2f)) {

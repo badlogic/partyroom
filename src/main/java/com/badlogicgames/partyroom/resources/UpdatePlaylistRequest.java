@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogicgames.partyroom.mvc.Item;
+import com.badlogicgames.partyroom.mvc.Playlist;
 
 public class UpdatePlaylistRequest {
 	public String userId;
-	public List<Item> playlist = new ArrayList<>();
+	public Playlist playlist;
 }

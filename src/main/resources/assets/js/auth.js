@@ -129,9 +129,7 @@ app.controller("NavBarController", ["$scope", "$window", "AuthService", function
 	
 	$scope.login = function() {
 		AuthService.showLoginDialog(function() {
-			$scope.join();
 		}, function() {
-			$scope.join();
 		}, function() {
 			$window.location.href = "index.html";
 		});

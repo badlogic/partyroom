@@ -1,31 +1,31 @@
-app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCookie", "AuthService", function($scope, $http, $window, $modal, ipCookie, AuthService) {	
+app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCookie", "AuthService", function($scope, $http, $window, $modal, ipCookie, AuthService) {
 	$scope.playLists = null;
 	$scope.currPlaylist = null;
 	$scope.youtubeKey = null;
-	
+
 	$http.post("app/users/getPlaylists", AuthService.getToken()).success(function(data) {
 		$scope.playLists = data.playlists;
 		$scope.youtubeKey = data.youtubeKey;
 	}).error(function() {
 		AuthService.logout();
 		$window.location.href="index.html";
-	});		
-	
+	});
+
 	$scope.playlistClicked = function(playlist) {
 		$scope.currPlaylist = playlist;
 	}
-	
+
 	$scope.savePlaylist = function(playlist) {
 		$http.post("app/users/updatePlaylist", { "userId": AuthService.getToken(), "playlist": playlist });
 	}
-	
+
 	$scope.addSong = function(song) {
 		$scope.isSearching=false;
-		if($.inArray(song, $scope.currPlaylist.items) != -1) return;		
+		if($.inArray(song, $scope.currPlaylist.items) != -1) return;
 		$scope.currPlaylist.items.push(song);
 		$scope.savePlaylist($scope.currPlaylist);
 	}
-	
+
 	$scope.removeSong = function(song) {
 		var idx = $scope.currPlaylist.items.indexOf(song);
 		if(idx > -1) {
@@ -33,7 +33,7 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 		}
 		$scope.savePlaylist($scope.currPlaylist);
 	}
-	
+
 	$scope.moveSongUp = function(song) {
 		var idx = $scope.currPlaylist.items.indexOf(song);
 		if(idx > 0) {
@@ -41,7 +41,7 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 		}
 		$scope.savePlaylist($scope.currPlaylist);
 	}
-	
+
 	$scope.moveSongDown = function(song) {
 		var idx = $scope.currPlaylist.items.indexOf(song);
 		if(idx >= 0 && idx < $scope.currPlaylist.items.length - 1) {
@@ -49,24 +49,24 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 		}
 		$scope.savePlaylist($scope.currPlaylist);
 	}
-	
+
 	$scope.shuffleSongs = function() {
 		shuffle($scope.currPlaylist.items);
 		$scope.savePlaylist($scope.currPlaylist);
 	}
-	
+
 	$scope.newPlaylist = function() {
 		var createCallback = function(name) {
-			var playlist = { "name": name, items: [] };			
+			var playlist = { "name": name, items: [] };
 			$scope.playLists.push(playlist);
 			$scope.currPlaylist = playlist;
 			$scope.savePlaylist($scope.currPlaylist);
 		}
-		
+
 		var outerScope = $scope;
-		
+
 		var modalInstance = $modal.open({
-			template: 
+			template:
 				'<div class="modal-header">' +
 				'<h3 class="modal-title">New Playlist</h3>' +
 				'</div>' +
@@ -76,17 +76,17 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 						'<input type="text" class="form-control" placeholder="Playlist name" required autofocus ng-model="name">' +
 					'</form>' +
 				'</div>' +
-				'<div class="modal-footer">' +            
+				'<div class="modal-footer">' +
 					'<button class="btn btn-primary" type="submit" ng-click="create(name)">Create</button>' +
 					'<button class="btn btn-warning" ng-click="cancel()">Cancel</button>' +
 				'</div>',
-			controller: function ($scope, $modalInstance) {								
+			controller: function ($scope, $modalInstance) {
 				$scope.create = function(name) {
 					if(!name || name.length == 0) {
 						$scope.errorMessage = "No name given";
 						return;
 					}
-					
+
 					for(var i = 0; i < outerScope.playLists.length; i++) {
 						var otherPlaylist = outerScope.playLists[i];
 						if(otherPlaylist.name === name) {
@@ -94,19 +94,19 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 							return;
 						}
 					}
-					
+
 					$modalInstance.dismiss('cancel');
 					createCallback(name);
 				};
-				
+
 				$scope.cancel = function() {
-					$modalInstance.dismiss('cancel');					
+					$modalInstance.dismiss('cancel');
 				}
 			},
 			keyboard: false
-		});			
+		});
 	}
-	
+
 	$scope.search = function () {
 	      $http.get('https://www.googleapis.com/youtube/v3/search', {
 	        params: {
@@ -140,17 +140,21 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 			    		part: "contentDetails"
 			    	}
 			    }).success(function(data) {
-			    	var newResults = [];
+			    	var songs = [];
 			    	for(var i = 0; i < data.items.length; i++) {
 			    		var result = results[i];
-			    		newResults.push(result);
-			    		result.duration = nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration);
+							var song = { "user": AuthService.getUserName(),
+													 "duration": nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration),
+													 "youtubeId": result.id,
+													 "thumbnail": result.thumbnail,
+													 "title": result.title }
+			    		songs.push(song);
 			    	}
-			    	$scope.searchResults = newResults;
+			    	$scope.searchResults = songs;
 			    });
-	      })  
+	      })
 	}
-	
+
 	$scope.searchUrl = function() {
 		console.log($scope.query);
 	}

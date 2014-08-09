@@ -73,7 +73,7 @@ public class RoomResource {
 	@Path("song")
 	public void setSong(SongRequest req) {
 		User user = users.getUser(req.userId);
-		rooms.setSong(user, req.roomName, req.song);
+		rooms.setSong(user, req.roomName, req.playList);
 	}
 	
 	@POST

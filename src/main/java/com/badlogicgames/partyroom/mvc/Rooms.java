@@ -160,8 +160,8 @@ public class Rooms {
 				
 				// get the current song of the current user
 				UserRoomData currentUserData = room.songsPerUser.get(room.users.get(room.currentUser).name);
-				room.currentSong = currentUserData.song;
-				currentUserData.song = null;
+				room.currentSong = currentUserData.playList.size() > 0? currentUserData.playList.get(0): null;
+				if(currentUserData.playList.size() > 0) currentUserData.playList.remove(0);
 				
 				// calculate when the song has started in UTC, as well as when to switch to the next song, in server time
 				// we use a delay of 4 seconds between songs.
@@ -222,13 +222,13 @@ public class Rooms {
 	 * Sets the song to be played for the next user. Synchs on the room
 	 * the user is in, hence why it's in this class.
 	 */
-	public void setSong (User user, String roomName, Item song) {
+	public void setSong (User user, String roomName, List<Item> playList) {
 		Objects.requireNonNull(user, "user may not be null");
 		Objects.requireNonNull(roomName, "room name may not be null");
 		
 		Room room = rooms.get(roomName);
 		synchronized(room) {
-			room.songsPerUser.get(user.name).song = song;			
+			room.songsPerUser.get(user.name).playList = playList;			
 		}
 	}
 	

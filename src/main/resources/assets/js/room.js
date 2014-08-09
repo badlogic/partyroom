@@ -168,12 +168,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}
 
 	$scope.updateSong = function() {
-		if($scope.playList.length == 0) {
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "song": null });
-		} else {
-			var song = $scope.playList[0];
-			$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "song": song});
-		}
+		$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "playList": $scope.playList });					
 	}
 
 	$scope.addSong = function(song) {

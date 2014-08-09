@@ -16,12 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * some race conditions while locking at a very fine-grained level.
  */
 public class Rooms {	
-	private static final long HEART_BEAT = 10000000000l;
 	private static final long DELAY_BETWEEN_SONGS = 4000000000l;
 	private final Map<String, Room> rooms = new ConcurrentHashMap<>();
 	private final String youtubeKey;
+	private final long heartBeat;
 	
-	public Rooms(String youtubeKey) {
+	public Rooms(String youtubeKey, long heartBeat) {
+		this.heartBeat = heartBeat;
 		this.youtubeKey = youtubeKey;
 		final Thread t = new Thread(() -> {
 			while(true) {
@@ -29,7 +30,7 @@ public class Rooms {
 					for(Entry<String, Room> entry: rooms.entrySet()) {						
 						if(entry.getValue() != null && 
 							(entry.getValue().users.size() == 0 ||
-							 System.nanoTime() - entry.getValue().lastUpdate > HEART_BEAT)) {
+							 System.nanoTime() - entry.getValue().lastUpdate > heartBeat)) {
 							rooms.remove(entry.getKey());
 							System.out.println("removed room " + entry.getKey());
 						}
@@ -142,7 +143,7 @@ public class Rooms {
 				for(User otherUser: room.users) {
 					UserRoomData otherUserData = room.songsPerUser.get(otherUser.name);
 					otherUserData.lastVote = 0;
-					if(System.nanoTime() - otherUserData.lastUpdate > HEART_BEAT) {
+					if(System.nanoTime() - otherUserData.lastUpdate > heartBeat) {
 						usersToRemove.add(otherUser);
 					}
 				}

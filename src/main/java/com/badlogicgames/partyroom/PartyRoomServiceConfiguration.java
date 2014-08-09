@@ -18,6 +18,10 @@ public class PartyRoomServiceConfiguration extends Configuration implements com.
 	@NotNull
 	public String youtubeKey;
 	
+	@JsonProperty
+	@Valid
+	public long heartBeat = 10000000000l; // 10 seconds
+	
 	@Override
 	public StaticAssetsConfiguration getAssetsConfiguration () {
 		return assets;

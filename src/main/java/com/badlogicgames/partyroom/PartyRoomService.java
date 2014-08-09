@@ -23,7 +23,7 @@ public class PartyRoomService extends Service<PartyRoomServiceConfiguration> {
 	@Override
 	public void run (PartyRoomServiceConfiguration config, Environment env) throws Exception {
 		Users users = new Users();
-		Rooms rooms = new Rooms(config.youtubeKey);
+		Rooms rooms = new Rooms(config.youtubeKey, config.heartBeat);
 		
 		env.addResource(new UserResource(users, config.youtubeKey));
 		env.addResource(new RoomResource(rooms, users));

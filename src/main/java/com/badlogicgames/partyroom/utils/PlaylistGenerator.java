@@ -134,6 +134,13 @@ public class PlaylistGenerator {
 		for(Playlist playlist: playlists) {
 			writePlaylist(playlist, new File(output, FileNameCleaner.cleanFileName(playlist.title + ".xspf")));
 		}
+		
+		Playlist allPlaylist = new Playlist();
+		allPlaylist.title = "All playlists in one!";
+		for(Playlist playlist: playlists) {
+			allPlaylist.files.addAll(playlist.files);
+		}
+		writePlaylist(allPlaylist, new File(output, FileNameCleaner.cleanFileName(allPlaylist.title + ".xspf")));
 	}
 	
 	private void writePlaylist (Playlist playlist, File outputFile) throws IOException {		

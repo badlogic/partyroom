@@ -55,7 +55,7 @@ public class Users {
 					for(String key: idToUsers.keySet()) {
 						String name = idToUsers.get(key).name;
 						User user = this.users.get(name);
-						this.idToUsers.put(name, user);
+						this.idToUsers.put(key, user);
 						this.namesToIds.put(name, key);
 					}
 					
@@ -68,7 +68,7 @@ public class Users {
 					}
 
 				} catch(Exception e) {
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 			}
 		}

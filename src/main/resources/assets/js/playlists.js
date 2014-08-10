@@ -107,6 +107,61 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 		});
 	}
 
+	$scope.newPlaylistXspf = function() {
+		var originalUrl = null;
+		var createCallback = function(url) {
+			originalUrl = url;
+			$http.post("app/proxy/fetch", url).success(function(data) {
+				var xml = jQuery.parseXML(data);
+				var url = originalUrl.substring(0, originalUrl.lastIndexOf("/")) + "/";
+				var playlist = { name: "", items: [] };
+				playlist.name = $($(xml).find("playlist").find("title")[0]).text();
+				$(xml).find("track").each(function() {
+					var item = $(this);
+					playlist.items.push({
+						"user": AuthService.getUserName(),
+						"duration": parseInt(item.find("duration").text()) / 1000,
+						"url": url + item.find("location").text(),
+						"thumbnail": null,
+						"title": item.find("title").text()
+					});
+				});
+				$scope.playLists.push(playlist);
+				$scope.currPlaylist = playlist;
+				$scope.savePlaylist($scope.currPlaylist);
+			});
+		}
+
+		var modalInstance = $modal.open({
+			template:
+				'<div class="modal-header">' +
+				'<h3 class="modal-title">New Playlist from XSPF URL</h3>' +
+				'</div>' +
+				'<div class="modal-body">' +
+					'<form class="form-signin" role="form">' +
+						'<div ng-show="errorMessage" class="alert alert-danger">{{errorMessage}}</div>' +
+						'<input type="text" class="form-control" placeholder="URL to XSPF or directory listing" required autofocus ng-model="url">' +
+					'</form>' +
+				'</div>' +
+				'<div class="modal-footer">' +
+					'<button class="btn btn-primary" type="submit" ng-click="create(url)">Load</button>' +
+					'<button class="btn btn-warning" ng-click="cancel()">Cancel</button>' +
+				'</div>',
+			controller: function ($scope, $modalInstance) {
+				$scope.url = "http://192.168.1.4:8000/A%20Perfect%20Circle%20-%20Acoustic.xspf";
+				$scope.create = function(url) {
+					$modalInstance.dismiss('cancel');
+					createCallback(url);
+				};
+
+				$scope.cancel = function() {
+					$modalInstance.dismiss('cancel');
+				}
+			},
+			keyboard: false
+		});
+	}
+
 	$scope.search = function () {
 	      $http.get('https://www.googleapis.com/youtube/v3/search', {
 	        params: {
@@ -145,7 +200,7 @@ app.controller("LobbyController", ["$scope", "$http", "$window", "$modal", "ipCo
 			    		var result = results[i];
 							var song = { "user": AuthService.getUserName(),
 													 "duration": nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration),
-													 "youtubeId": result.id,
+													 "url": result.id,
 													 "thumbnail": result.thumbnail,
 													 "title": result.title }
 			    		songs.push(song);

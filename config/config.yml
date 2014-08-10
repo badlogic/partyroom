@@ -10,3 +10,4 @@ http:
 
 youtubeKey: AIzaSyDLnw29DUCETqv9gL2YtCx6iLNkEmt1ArE
 heartBeat: 8640000000000
+dbDir: db/

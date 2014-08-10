@@ -22,6 +22,11 @@ public class PartyRoomServiceConfiguration extends Configuration implements com.
 	@Valid
 	public long heartBeat = 10000000000l; // 10 seconds
 	
+	@JsonProperty
+	@Valid
+	@NotNull
+	public String dbDir;
+	
 	@Override
 	public StaticAssetsConfiguration getAssetsConfiguration () {
 		return assets;

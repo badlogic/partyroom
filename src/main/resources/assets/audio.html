@@ -1,0 +1,35 @@
+<include>templates/header.html</include>
+
+<script>
+
+app.controller("AudioController", ["$scope", "$http", "$window", "ipCookie", "AuthService", function($scope, $http, $window, ipCookie, AuthService) {
+  $scope.loaded = false;
+  $scope.audio = document.getElementById("audioplayer");
+  $scope.url = "http://192.168.1.4:8000/Blind%20Melon/28%20Blind%20Melon%20%26%20Pearl%20Jam%20members%20-%20Wither%20-%20%28acoustic%29.mp3";
+
+  $scope.getMetadata = function(url) {
+      var audio = $scope.audio;
+      audio.src = url;
+      audio.addEventListener("loadedmetadata", function() {
+        $scope.loaded = true;
+        audio.removeEventListener(this);
+        audio.play()
+        console.log("loaded metadata of " + audio.src + ", " + audio.duration + " secs");
+        $scope.$apply();
+      });
+      audio.load();
+  }
+
+  $scope.play = function() {
+    $scope.audio.play();
+  }
+}]);
+</script>
+
+<div class="row" ng-controller="AudioController">
+  <audio ng-show="loaded" id="audioplayer" controls="true"></audio>
+  <input ng-model="url"></input>
+  <button class="btn btn-primary btn-xs" ng-click="getMetadata(url)">Load</button>
+</div>
+
+<include>templates/footer.html</include>

@@ -6,7 +6,7 @@ function getUrlParameter(sParam) {
 		if (sParameterName[0] == sParam) {
 			return sParameterName[1];
 		}
-	}	
+	}
 }
 
 Array.prototype.move = function (old_index, new_index) {
@@ -24,3 +24,10 @@ function shuffle(o){ //v1.0
     for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
 };
+
+if (typeof String.prototype.startsWith != 'function') {
+  // see below for better implementation!
+  String.prototype.startsWith = function (str){
+    return this.indexOf(str) == 0;
+  };
+}

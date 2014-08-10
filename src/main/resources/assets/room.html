@@ -7,24 +7,27 @@
 <div ng-controller="RoomController">
 	<div class="row">
 		<!-- video player -->
-		<div class="col-md-7 nopadding">
+		<div class="col-md-7 nopadding" style="text-align:center;">
 			<div class="text-center" style="margin-bottom: 15px;">
-				<div id="player">
-	  			</div>
-  			</div>
-  		</div>
-  		<!-- now playing & playlist -->
-  		<div class="col-md-5 nopadding">
-  			<h2 class="text-center">Room "{{roomName}}"</h2>
+				<div ng-hide="useAudioPlayer">
+					<div id="player">
+					</div>
+				</div>
+			</div>
+			<audio id="audioplayer" ng-hide="!useAudioPlayer" style="margin:auto; height: 200px" controls="true"></audio>
+		</div>
+		<!-- now playing & playlist -->
+		<div class="col-md-5 nopadding">
+			<h2 class="text-center">Room "{{roomName}}"</h2>
 
-  			<!-- Now playing, next up, or loading state -->
-  			<div ng-hide="currentUser()" class="text-center">
+			<!-- Now playing, next up, or loading state -->
+			<div ng-hide="currentUser()" class="text-center">
 				<h3>Loading room <span style="color: red;">"{{roomName}}" </span><i class="fa fa-spinner fa-spin"></i></h3>
 			</div>
-  			<div ng-hide="!currentUser()" class="box">
-	  			<h4>Now Playing <span style="color: #f00;">{{currentUser()}}'s</span> song!</h4>
-  				<div ng-hide="!currentSong().title">
-				  	<strong>Title: </strong>{{currentSong().title}}</br>
+			<div ng-hide="!currentUser()" class="box">
+				<h4>Now Playing <span style="color: #f00;">{{currentUser()}}'s</span> song!</h4>
+				<div ng-hide="!currentSong().title">
+					<strong>Title: </strong>{{currentSong().title}}</br>
 					<span><strong>Time: </strong>{{getOffset()}}/{{currentSong().duration}} secs</br></span>
 					<i class="fa fa-thumbs-o-up fa-2x pointer" ng-click="upvote()"></i> {{room.positiveVotes}}
 					<i class="fa fa-thumbs-o-down fa-2x pointer" ng-click="downvote()"></i> {{room.negativeVotes}}
@@ -80,12 +83,12 @@
 					<div ng-hide="selectedPlaylist">
 						<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
 						<table class="table table-striped">
-								<tr ng-repeat="playlist in playlists">
-										<td>{{playlist.name}}</td>
-										<td>{{playlist.items.length}} songs</td>
-										<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addPlaylist(playlist)"></i></td>
-										<td><i class="fa fa-list fa-2x pointer" ng-click="selectPlaylist(playlist)"></i></td>
-								</tr>
+							<tr ng-repeat="playlist in playlists">
+								<td>{{playlist.name}}</td>
+								<td>{{playlist.items.length}} songs</td>
+								<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addPlaylist(playlist)"></i></td>
+								<td><i class="fa fa-list fa-2x pointer" ng-click="selectPlaylist(playlist)"></i></td>
+							</tr>
 						</table>
 					</div>
 					<div ng-hide="!selectedPlaylist" class="searchlist" id="searchlist">

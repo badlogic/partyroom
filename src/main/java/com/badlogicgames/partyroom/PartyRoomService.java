@@ -4,6 +4,7 @@ import com.badlogicgames.partyroom.assets.StaticAssetsBundle;
 import com.badlogicgames.partyroom.assets.TemplateProcessor;
 import com.badlogicgames.partyroom.mvc.Rooms;
 import com.badlogicgames.partyroom.mvc.Users;
+import com.badlogicgames.partyroom.resources.ProxyResource;
 import com.badlogicgames.partyroom.resources.RoomResource;
 import com.badlogicgames.partyroom.resources.UserResource;
 import com.bazaarvoice.dropwizard.redirect.RedirectBundle;
@@ -22,11 +23,12 @@ public class PartyRoomService extends Service<PartyRoomServiceConfiguration> {
 
 	@Override
 	public void run (PartyRoomServiceConfiguration config, Environment env) throws Exception {
-		Users users = new Users();
+		Users users = new Users(config.dbDir);
 		Rooms rooms = new Rooms(config.youtubeKey, config.heartBeat);
 		
 		env.addResource(new UserResource(users, config.youtubeKey));
 		env.addResource(new RoomResource(rooms, users));
+		env.addResource(new ProxyResource());
 	}
 	
 	public static void main (String[] args) throws Exception {

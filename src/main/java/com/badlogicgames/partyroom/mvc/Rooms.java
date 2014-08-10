@@ -24,22 +24,27 @@ public class Rooms {
 	public Rooms(String youtubeKey, long heartBeat) {
 		this.heartBeat = heartBeat;
 		this.youtubeKey = youtubeKey;
-		final Thread t = new Thread(() -> {
-			while(true) {
-				synchronized(rooms) {
-					for(Entry<String, Room> entry: rooms.entrySet()) {						
-						if(entry.getValue() != null && 
-							(entry.getValue().users.size() == 0 ||
-							 System.nanoTime() - entry.getValue().lastUpdate > heartBeat)) {
-							rooms.remove(entry.getKey());
-							System.out.println("removed room " + entry.getKey());
+		final long hb = heartBeat;
+		final Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run () {
+				while(true) {
+					synchronized(rooms) {
+						for(Entry<String, Room> entry: rooms.entrySet()) {						
+							if(entry.getValue() != null && 
+								(entry.getValue().users.size() == 0 ||
+								 System.nanoTime() - entry.getValue().lastUpdate > hb)) {
+								rooms.remove(entry.getKey());
+								System.out.println("removed room " + entry.getKey());
+							}
 						}
 					}
-				}
-				
-				try {
-					Thread.sleep(10000);
-				} catch (Exception e) {
+					
+					try {
+						Thread.sleep(10000);
+					} catch (Exception e) {
+					}
 				}
 			}
 		});

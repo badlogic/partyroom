@@ -43,22 +43,34 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}
 
 	$scope.processUpdate = function(data) {
+		// video player not ready yets
+		if(!player) return;
+
 		// we may get a null song, create an empty one in that case
-		if(!data.currentSong) data.currentSong = { youtubeId: null, user: null };
-		if(!$scope.room.currentSong) $scope.room.currentSong = { youtubeId: null, user: null };
+		if(!data.currentSong) data.currentSong = { url: null, user: null };
+		if(!$scope.room.currentSong) $scope.room.currentSong = { url: null, user: null };
 
 		// if the song changed
-		if(data.currentSong.youtubeId !== $scope.room.currentSong.youtubeId) {
-			// playback the new video
-			if(data.currentSong.youtubeId) {
-				$scope.playVideo(data.currentSong.youtubeId, data.playedTime, data.currentSong.duration);
-			} else {
-				if(player) player.stopVideo();
-			}
+		if(data.currentSong.url !== $scope.room.currentSong.url) {
+			// stop the players
+			if(player) player.stopVideo();
+			audioPlayer = document.getElementById("audioplayer");
+			if(audioPlayer) audioPlayer.pause();
+
+			// playback the new video/audio file
+			if(data.currentSong.url) {
+				if(data.currentSong.url.startsWith("http://")) {
+					$scope.useAudioPlayer = true;
+					$scope.playAudio(data.currentSong.url, data.playedTime, data.currentSong.duration);
+				} else {
+					$scope.useAudioPlayer = false;
+					$scope.playVideo(data.currentSong.url, data.playedTime, data.currentSong.duration);
+				}
+			}			
 
 			// update the playlist if the currently playing song is ours
 			if($scope.playList.length > 0 &&
-			   $scope.playList[0].youtubeId === data.currentSong.youtubeId &&
+			   $scope.playList[0].url === data.currentSong.url &&
 			   $scope.playList[0].user === data.currentSong.user) {
 				$scope.playList.shift();
 				$scope.updateSong();
@@ -94,6 +106,20 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 		return player.getPlayerState() >= 1 && player.getPlayerState() <= 3;
 	}
 
+	$scope.playAudio = function(url, startTime, duration) {
+		var audio = document.getElementById("audioplayer");
+		audio.src = url;
+		if(startTime < 0) startTime = 0;
+		if(startTime > duration) startTime = duration;
+
+		audio.addEventListener("canplay", function() {
+			audio.removeEventListener(this);
+			audio.currentTime = startTime;
+			audio.play();
+		});
+		audio.load();
+	}
+
 	$scope.playVideo = function(id, startTime, duration) {
 		if(!player) return;
 		if(startTime < 0) startTime = 0;
@@ -103,7 +129,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}
 
 	$scope.getOffset = function() {
-		if(!$scope.room.currentSong || !$scope.room.currentSong.youtubeId) return 0;
+		if(!$scope.room.currentSong || (!$scope.room.currentSong.url)) return 0;
 		return $scope.room.playedTime;
 	}
 
@@ -155,7 +181,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 							var song = {
 								"user": AuthService.getUserName(),
 								"duration": nezasa.iso8601.Period.parseToTotalSeconds(data.items[i].contentDetails.duration),
-								"youtubeId": result.id,
+								"url": result.id,
 								"thumbnail": result.thumbnail,
 								"title": result.title
 							};
@@ -168,7 +194,7 @@ app.controller("RoomController", ["$scope", "$http", "$location", "$window", "$t
 	}
 
 	$scope.updateSong = function() {
-		$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "playList": $scope.playList });					
+		$http.post("app/rooms/song", { "userId": AuthService.getToken(), "roomName": $scope.roomName, "playList": $scope.playList });
 	}
 
 	$scope.addSong = function(song) {

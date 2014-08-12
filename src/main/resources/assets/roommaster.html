@@ -1,0 +1,136 @@
+<include>templates/header.html</include>
+
+<script src="js/iso8601.min.js"></script>
+<script src="js/room.js"></script>
+
+
+<div ng-controller="RoomController">
+	<div class="row">
+		<!-- video player -->
+		<div class="col-md-7 nopadding" style="text-align:center;">
+			<div class="text-center" style="margin-bottom: 15px;">
+				<div ng-hide="useAudioPlayer">
+					<div id="player">
+					</div>
+				</div>
+			</div>
+			<audio id="audioplayer" ng-hide="!useAudioPlayer" style="margin:auto; height: 200px" controls="true"></audio>
+		</div>
+		<!-- now playing & playlist -->
+		<div class="col-md-5 nopadding">
+			<!-- Now playing, next up, or loading state -->
+			<div ng-hide="currentUser()" class="text-center">
+				<h3>Loading room <span style="color: red;">"{{roomName}}" </span><i class="fa fa-spinner fa-spin"></i></h3>
+			</div>
+			<div ng-hide="!currentUser()" class="box">
+				<h4>Now Playing <span style="color: #f00;">{{currentUser()}}'s</span> song!</h4>
+				<div ng-hide="!currentSong().title">
+					<strong>Title: </strong>{{currentSong().title}}</br>
+					<span><strong>Time: </strong>{{getOffset()}}/{{currentSong().duration}} secs</br></span>
+					<i class="fa fa-thumbs-o-up fa-2x pointer" ng-click="upvote()"></i> {{room.positiveVotes}}
+					<i class="fa fa-thumbs-o-down fa-2x pointer" ng-click="downvote()"></i> {{room.negativeVotes}}
+					<strong>Upvote for <3, downvote to skip!</strong>
+				</div>
+				<div ng-hide="currentSong().title">
+					No songs in playlist
+				</div>
+			</div>
+			<!-- Playlist -->
+			<div class="box">
+
+				<div ng-hide="isSearching">
+					<h4>
+						Your Playlist
+						<button class="btn btn-primary btn-xs" ng-click="isSearching='youtube'"><i class="fa fa-plus-circle"></i> Add Song (Youtube)</button>
+						<button class="btn btn-primary btn-xs" ng-click="isSearching='playlist';getPlaylists()"><i class="fa fa-plus-circle"></i> Add Playlist</button>
+						<button ng-hide="playList.length < 2" class="btn btn-primary btn-xs" ng-click="shuffleSongs()">Shuffle</button>
+					</h4>
+					<div class="playlist">
+						<table class="table table-striped">
+							<tr ng-repeat="song in playList">
+								<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+								<td><i class="fa fa-arrow-circle-up fa-2x pointer" ng-click="moveSongUp(song)"></i></br><i class="fa fa-arrow-circle-down fa-2x pointer" ng-click="moveSongDown(song)"></i></td>
+								<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+								<td><i class="fa fa-trash-o fa-2x pointer" ng-click="removeSong(song)"></i></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div ng-show="isSearching==='youtube'">
+					<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
+					<form ng-submit="search()">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search songs by title, band, ..." required autofocus ng-model="query">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="submit">Search</button>
+							</span>
+						</div>
+					</form>
+					<div class="searchlist" id="searchlist">
+						<table class="table table-striped">
+							<tr ng-repeat="song in searchResults">
+								<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+								<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+								<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addSong(song)"></i></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+
+				<div ng-show="isSearching==='playlist'">
+					<div ng-hide="selectedPlaylist">
+						<h4>Add Song to Playlist <button class="btn btn-primary btn-xs" ng-click="isSearching=false">Cancel</button></h4>
+						<table class="table table-striped">
+							<tr ng-repeat="playlist in playlists">
+								<td>{{playlist.name}}</td>
+								<td>{{playlist.items.length}} songs</td>
+								<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addPlaylist(playlist)"></i></td>
+								<td><i class="fa fa-list fa-2x pointer" ng-click="selectPlaylist(playlist)"></i></td>
+							</tr>
+						</table>
+					</div>
+					<div ng-hide="!selectedPlaylist" class="searchlist" id="searchlist">
+						<h4>Select Song from "{{selectedPlaylist.name}}" <button class="btn btn-primary btn-xs" ng-click="selectPlaylist(null)">Back to Playlists</button></h4>
+						<table class="table table-striped">
+							<tr ng-repeat="song in selectedPlaylist.items">
+								<td><img class="video-img" ng-src="{{song.thumbnail}}"/></td>
+								<td><div class="video-title"><strong>{{song.title}} ({{song.duration}} secs)</strong></div></td>
+								<td><i class="fa fa-plus-circle fa-2x pointer" ng-click="addSong(song)"></i></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<!-- Chat box -->
+		<div class="col-md-7 nopadding">
+			<div class="box" style="min-height: 200px;">
+				<h4>Chat</h4>
+				<div class="chatlist" id="chatlist">
+					<div class="chat-message" ng-repeat="message in room.messages">
+						<strong ng-show="message.userName">{{message.userName}}:</strong> {{message.message}}
+					</div>
+				</div>
+				<form ng-submit="sendMessage()">
+					<input type="text" class="form-control" placeholder="Message..." required ng-model="message">
+				</form>
+			</div>
+		</div>
+
+		<!-- user list -->
+		<div class="col-md-5 nopadding">
+			<div class="box">
+				<h4>Users ({{room.users.length}})</h4>
+				<div class="userlist">
+					<div class="chat-message" ng-repeat="user in room.users">
+						<i ng-show="user.name === currentUser()" class="fa fa-volume-up"></i> <strong>{{user.name}}</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<include>templates/footer.html</include>
